@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using OpenAISharp.API;
 using System;
 using System.Collections.Generic;
@@ -15,10 +16,7 @@ namespace OpenAISharp
         public OpenAIConfiguration() { }
         public static void Load(string configFile)
         {
-            var builder = new ConfigurationBuilder()
-    .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile(configFile, optional: true, reloadOnChange: true);
-
+            var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile(configFile, optional: true, reloadOnChange: true);
             IConfigurationRoot configuration = builder.Build();
             OpenAIConfiguration openAIConfig = configuration.GetSection("OpenAI").Get<OpenAIConfiguration>();
             OpenAISettings.UrlPrefix = openAIConfig.UrlPrefix;
@@ -39,11 +37,13 @@ namespace OpenAISharp
                 _initializationVectorBase64String = value;
             } 
         }
+        public string UrlPrefix { get; set; }
         public string EncryptedOrgID { get; set; }
         public string EncryptedApiKey { get; set; }
 
         string decryptedOrgID;
         string decryptedApiKey;
+        [JsonIgnore]
         public string OrganizationID
         {
             get
@@ -60,6 +60,7 @@ namespace OpenAISharp
                 }
             }
         }
+        [JsonIgnore]
         public string ApiKey
         {
             get
@@ -76,6 +77,5 @@ namespace OpenAISharp
                 }
             }
         }
-        public string UrlPrefix { get; set; }
     }
 }
