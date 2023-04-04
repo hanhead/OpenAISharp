@@ -5,7 +5,6 @@ namespace OpenAISharp
 {
     public class EncryptionUtils
     {
-
         static byte[] ConvertStringTo16Bytes(string macString)
         {
             byte[] keyBytes = new byte[16];
@@ -19,10 +18,8 @@ namespace OpenAISharp
             {
                 keyBytes[i] = 0;
             }
-
             return keyBytes;
         }
-
         public static byte[] GetMacAddress16BytesFormat()
         {
             NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
@@ -31,7 +28,6 @@ namespace OpenAISharp
             byte[] keyBytes = ConvertStringTo16Bytes(macString);
             return keyBytes;
         }
-
         public static string GetNewInitailizationVectorBase64String()
         {
             byte[] iv = new byte[8];
@@ -39,10 +35,8 @@ namespace OpenAISharp
             {
                 rng.GetBytes(iv);
             }
-
             string InitializationVectorBase64String = Convert.ToBase64String(iv);
             return InitializationVectorBase64String;
         }
-
     }
 }
