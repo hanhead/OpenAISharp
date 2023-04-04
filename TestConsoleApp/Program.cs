@@ -1,19 +1,19 @@
-﻿// See https://aka.ms/new-console-template for more information
-using Microsoft.Extensions.Configuration;
+﻿using Newtonsoft.Json;
 using OpenAISharp;
-using OpenAISharp.API;
-using System.Globalization;
-using System.IO;
-using System.Net.NetworkInformation;
-using System.Security.Cryptography;
-using System.Text;
 
+string InitializationVectorBase64String = EncryptionUtils.GetNewInitailizationVectorBase64String();
+TripleDesEncryption tripleDesc = new TripleDesEncryption(EncryptionUtils.GetMacAddress16BytesFormat(), InitializationVectorBase64String);
 
-OpenAIConfiguration.Load("appsettings.json");
-Console.WriteLine($"{OpenAISettings.OrganizationID}, {OpenAISettings.ApiKey}");
-Models _result = await Models.List(true);
-Console.WriteLine(_result.ToString());
-Model result = await Models.Get("text-davinci-003", true);
-Console.WriteLine( result );
-Console.WriteLine("Done");
+var openAIConfiguration =new
+{
+    OpenAI = new OpenAIConfiguration()
+    {
+        UrlPrefix = "https://api.openai.com/v1",
+        InitializationVectorBase64String = InitializationVectorBase64String,
+        EncryptedOrgID = tripleDesc.Encrypt("YOUR_ORGANIZATION_ID"),
+        EncryptedApiKey = tripleDesc.Encrypt("YOUR_API_KEY")
+    }
+};
+string _json = JsonConvert.SerializeObject(openAIConfiguration, Formatting.Indented);
+Console.WriteLine(_json);
 Console.ReadLine(); 
