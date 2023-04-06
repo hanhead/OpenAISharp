@@ -14,7 +14,7 @@ namespace OpenAISharp
         TripleDesEncryption tripleDesc;
         private string _initializationVectorBase64String;
         public OpenAIConfiguration() { }
-        public static void Load(string configFile)
+        public static void Load(string configFile = "appsettings.json")
         {
             var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile(configFile, optional: true, reloadOnChange: true);
             IConfigurationRoot configuration = builder.Build();
