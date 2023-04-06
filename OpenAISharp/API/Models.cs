@@ -10,7 +10,7 @@ namespace OpenAISharp.API
 {
     public class Models
     {
-        public static async Task<Models> List(bool cachedData = true)
+        public static async Task<Models> List(bool cachedData = false)
         {
             string command = "/models";
             string result;
@@ -40,7 +40,7 @@ namespace OpenAISharp.API
 
             return models;
         }
-        public static async Task<Model> Get(string ModelName, bool cachedData = true)
+        public static async Task<Model> Get(string ModelName, bool cachedData = false)
         {
             string command = "/models/{0}";
             string result;
