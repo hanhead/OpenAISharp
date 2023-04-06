@@ -1,4 +1,5 @@
-# Open AI API C# Library: OpenAISharp
+
+
 
 ## Introduction
 This C# library provides easy access to Open AI's powerful API for natural language processing and text generation. With just a few lines of code, you can use state-of-the-art deep learning models like GPT-3 and GPT-4 to generate human-like text, complete tasks, and more.
@@ -21,7 +22,7 @@ Finally, it serializes the configuration object to a JSON string and prints it t
 
 Use this as a starting point for setting up your own OpenAI API configuration in a C# application.
 
-```
+``` csharp
 using Newtonsoft.Json;
 using OpenAISharp;
 
@@ -47,12 +48,17 @@ Console.ReadLine();
 ## Getting Started
 To use this library, you'll need to sign up for an Open AI API key and install the package from NuGet. Then, simply initialize the OpenAI class with your API key and start generating text!
 
-```
+``` csharp
+using Newtonsoft.Json;
 using OpenAISharp;
+using OpenAISharp.API;
+
+OpenAIConfiguration.Load();
+string _result = await Completions.Request("what is the best foods for a red wine?", Completions.Model.text_davinci_003, null, null, 1, 1);
+Console.WriteLine(_result);
 
 
 ```
 
 ## Contributing
 Contributions are welcome! Whether you've found a bug, want to add a new feature, or just have a suggestion, feel free to open an issue or pull request.
-
