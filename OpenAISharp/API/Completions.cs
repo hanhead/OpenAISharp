@@ -13,7 +13,7 @@ namespace OpenAISharp.API
     public class Completions
     {
         
-        public enum Model
+        public enum AvailableModel
         {
             gpt_3_5_turbo,
             gpt_3_5_turbo_0301,
@@ -21,21 +21,13 @@ namespace OpenAISharp.API
             text_davinci_002,
             code_davinci_002
         }
-        public class ModelDetail
-        {
-            public Model key {  get; set; }
-            public string ID { get; set; }
-            public string Description { get; set; }
-            public int MaxTokens { get; set; }
-            public string TrainingData { get; set; }
-        }
-        public Completions(Model Model = Model.gpt_3_5_turbo)
+        public Completions(AvailableModel Model = AvailableModel.text_davinci_003)
         {
             SelectedModel = Model;
             Models = new List<ModelDetail>() { 
                 new ModelDetail()
                 {
-                    key = Model.gpt_3_5_turbo,
+                    key = AvailableModel.gpt_3_5_turbo,
                     ID = "gpt-3.5-turbo",
                     Description = "Most capable GPT-3.5 model and optimized for chat at 1/10th the cost of text-davinci-003. Will be updated with our latest model iteration.",
                     MaxTokens = 4096,
@@ -43,7 +35,7 @@ namespace OpenAISharp.API
                 },
                 new ModelDetail()
                 {
-                    key = Model.gpt_3_5_turbo_0301,
+                    key = AvailableModel.gpt_3_5_turbo_0301,
                     ID = "gpt-3.5-turbo-0301",
                     Description = "Snapshot of gpt-3.5-turbo from March 1st 2023. Unlike gpt-3.5-turbo, this model will not receive updates, and will only be supported for a three month period ending on June 1st 2023.",
                     MaxTokens = 4096,
@@ -51,7 +43,7 @@ namespace OpenAISharp.API
                 },
                 new ModelDetail()
                 {
-                    key = Model.text_davinci_003,
+                    key = AvailableModel.text_davinci_003,
                     ID = "text-davinci-003",
                     Description = "Can do any language task with better quality, longer output, and consistent instruction-following than the curie, babbage, or ada models. Also supports inserting completions within text.",
                     MaxTokens = 4097,
@@ -59,7 +51,7 @@ namespace OpenAISharp.API
                 },
                 new ModelDetail()
                 {
-                    key = Model.text_davinci_002,
+                    key = AvailableModel.text_davinci_002,
                     ID = "text-davinci-002",
                     Description = "Similar capabilities to text-davinci-003 but trained with supervised fine-tuning instead of reinforcement learning",
                     MaxTokens = 4097,
@@ -67,7 +59,7 @@ namespace OpenAISharp.API
                 },
                 new ModelDetail()
                 {
-                    key = Model.code_davinci_002,
+                    key = AvailableModel.code_davinci_002,
                     ID = "code-davinci-002",
                     Description = "Optimized for code-completion tasks",
                     MaxTokens = 8001,
@@ -76,7 +68,7 @@ namespace OpenAISharp.API
             };
         }
         [JsonIgnore]
-        public Model SelectedModel { get; set; }
+        public AvailableModel SelectedModel { get; set; }
         [JsonIgnore]
         public List<ModelDetail> Models { get; }
 
@@ -118,7 +110,9 @@ namespace OpenAISharp.API
         public object? logit_bias { get; set; }
         public string? user { get; set; }
         #endregion
-        public static async Task<string> Request(string prompt, Model model = Model.gpt_3_5_turbo, string? suffix = null, int? max_tokens = null, decimal? temperature = null, decimal? top_p = null, int? n = null, bool? stream = null, int? logprobs = null, bool? echo = null, string[]? stop = null, decimal? presence_penalty = null, decimal? frequency_penalty = null, int? best_of = null, object? logit_bias = null, string? user = null)
+
+        #region Request Methods
+        public static async Task<CompletionsReponse> Request(string prompt, AvailableModel model = AvailableModel.text_davinci_003, string? suffix = null, int? max_tokens = null, decimal? temperature = null, decimal? top_p = null, int? n = null, bool? stream = null, int? logprobs = null, bool? echo = null, string[]? stop = null, decimal? presence_penalty = null, decimal? frequency_penalty = null, int? best_of = null, object? logit_bias = null, string? user = null)
         {
             return await Request(new Completions()
             {
@@ -140,7 +134,7 @@ namespace OpenAISharp.API
                 user = user
             });
         }
-        public static async Task<string> Request(string[] prompt, Model model = Model.text_davinci_003, string? suffix = null, int? max_tokens = null, decimal? temperature = null, decimal? top_p = null, int? n = null, bool? stream = null, int? logprobs = null, bool? echo = null, string[]? stop = null, decimal? presence_penalty = null, decimal? frequency_penalty = null, int? best_of = null, object? logit_bias = null, string? user = null)
+        public static async Task<CompletionsReponse> Request(string[] prompt, AvailableModel model = AvailableModel.text_davinci_003, string? suffix = null, int? max_tokens = null, decimal? temperature = null, decimal? top_p = null, int? n = null, bool? stream = null, int? logprobs = null, bool? echo = null, string[]? stop = null, decimal? presence_penalty = null, decimal? frequency_penalty = null, int? best_of = null, object? logit_bias = null, string? user = null)
         {
             return await Request(new Completions()
             {
@@ -162,7 +156,7 @@ namespace OpenAISharp.API
                 user = user
             });
         }
-        public static async Task<string> Request(string[] prompt, string model, string? suffix = null, int? max_tokens = null, decimal? temperature = null, decimal? top_p = null, int? n = null, bool? stream = null, int? logprobs = null, bool? echo = null, string[]? stop = null, decimal? presence_penalty = null, decimal? frequency_penalty = null, int? best_of = null, object? logit_bias = null, string? user = null)
+        public static async Task<CompletionsReponse> Request(string[] prompt, string model, string? suffix = null, int? max_tokens = null, decimal? temperature = null, decimal? top_p = null, int? n = null, bool? stream = null, int? logprobs = null, bool? echo = null, string[]? stop = null, decimal? presence_penalty = null, decimal? frequency_penalty = null, int? best_of = null, object? logit_bias = null, string? user = null)
         {
             return await Request(new Completions()
             {
@@ -184,8 +178,9 @@ namespace OpenAISharp.API
                 user = user
             });
         }
-        public static async Task<string> Request(Completions completions)
+        public static async Task<CompletionsReponse> Request(Completions completions)
         {
+            CompletionsReponse completionsReponse = null;
             string command = "/completions";
             string result;
             string organzationID = OpenAISettings.OrganizationID;
@@ -204,11 +199,13 @@ namespace OpenAISharp.API
                 using (HttpResponseMessage response = await client.PostAsync(apiUrl, requestJsonContent))
                 {
                     result = await response.Content.ReadAsStringAsync();
-                    System.IO.File.WriteAllText("cachedData\\completions.json", result);
-                    //models = JsonConvert.DeserializeObject<Models>(result);
+                    completionsReponse = JsonConvert.DeserializeObject<CompletionsReponse>(result);
                 }
             }
-            return result;
+            return completionsReponse;
         }
+        #endregion
+
+
     }
 }
