@@ -15,6 +15,7 @@ namespace OpenAISharp.API
     public class Completions
     {
 
+        private static string command = "/completions";
         public enum AvailableModel
         {
             [Description("text-davinci-003")]
@@ -151,7 +152,6 @@ namespace OpenAISharp.API
         public static async Task<CompletionsReponse> Request(Completions completions)
         {
             CompletionsReponse completionsReponse = null;
-            string command = "/completions";
             string result;
             string organzationID = OpenAISettings.OrganizationID;
             string apiKey = OpenAISettings.ApiKey;
