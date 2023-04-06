@@ -54,7 +54,7 @@ using OpenAISharp;
 using OpenAISharp.API;
 
 OpenAIConfiguration.Load();
-string _result = await Completions.Request("what is the best foods for a red wine?", Completions.Model.text_davinci_003, null, null, 1, 1);
+string _result = await Completions.Request("what is the best foods for a red wine?");
 Console.WriteLine(_result);
 ```
 
