@@ -3,12 +3,23 @@ using Newtonsoft.Json;
 using OpenAISharp.API;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace OpenAISharp
 {
+    public static class Extensions
+    {
+        public static string GetDescription<T>(this T e) where T : Enum
+        {
+            var attribute = e.GetType().GetMember(e.ToString())
+                .FirstOrDefault()?.GetCustomAttribute<DescriptionAttribute>();
+            return attribute?.Description ?? e.ToString();
+        }
+    }
     public class OpenAIConfiguration
     {
         TripleDesEncryption tripleDesc;

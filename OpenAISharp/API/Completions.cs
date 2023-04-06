@@ -1,8 +1,10 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
@@ -12,65 +14,34 @@ namespace OpenAISharp.API
 {
     public class Completions
     {
-        
+
         public enum AvailableModel
         {
-            gpt_3_5_turbo,
-            gpt_3_5_turbo_0301,
+            [Description("text-davinci-003")]
             text_davinci_003,
+            [Description("text-davinci-002")]
             text_davinci_002,
-            code_davinci_002
+            [Description("text-curie-001")]
+            text_curie_001,
+            [Description("text-babbage-001")]
+            text_babbage_001,
+            [Description("text-ada-001")]
+            text_ada_001,
+            [Description("davinci")]
+            davinci,
+            [Description("curie")]
+            curie,
+            [Description("babbage")]
+            babbage,
+            [Description("ada")]
+            ada
         }
         public Completions(AvailableModel Model = AvailableModel.text_davinci_003)
         {
             SelectedModel = Model;
-            Models = new List<ModelDetail>() { 
-                new ModelDetail()
-                {
-                    key = AvailableModel.gpt_3_5_turbo,
-                    ID = "gpt-3.5-turbo",
-                    Description = "Most capable GPT-3.5 model and optimized for chat at 1/10th the cost of text-davinci-003. Will be updated with our latest model iteration.",
-                    MaxTokens = 4096,
-                    TrainingData = "Up to Sep 2021"
-                },
-                new ModelDetail()
-                {
-                    key = AvailableModel.gpt_3_5_turbo_0301,
-                    ID = "gpt-3.5-turbo-0301",
-                    Description = "Snapshot of gpt-3.5-turbo from March 1st 2023. Unlike gpt-3.5-turbo, this model will not receive updates, and will only be supported for a three month period ending on June 1st 2023.",
-                    MaxTokens = 4096,
-                    TrainingData = "Up to Sep 2021"
-                },
-                new ModelDetail()
-                {
-                    key = AvailableModel.text_davinci_003,
-                    ID = "text-davinci-003",
-                    Description = "Can do any language task with better quality, longer output, and consistent instruction-following than the curie, babbage, or ada models. Also supports inserting completions within text.",
-                    MaxTokens = 4097,
-                    TrainingData = "Up to Jun 2021"
-                },
-                new ModelDetail()
-                {
-                    key = AvailableModel.text_davinci_002,
-                    ID = "text-davinci-002",
-                    Description = "Similar capabilities to text-davinci-003 but trained with supervised fine-tuning instead of reinforcement learning",
-                    MaxTokens = 4097,
-                    TrainingData = "Up to Jun 2021"
-                },
-                new ModelDetail()
-                {
-                    key = AvailableModel.code_davinci_002,
-                    ID = "code-davinci-002",
-                    Description = "Optimized for code-completion tasks",
-                    MaxTokens = 8001,
-                    TrainingData = "Up to Jun 2021"
-                }
-            };
         }
         [JsonIgnore]
         public AvailableModel SelectedModel { get; set; }
-        [JsonIgnore]
-        public List<ModelDetail> Models { get; }
 
         #region properties for json
         private string _model;
@@ -79,8 +50,7 @@ namespace OpenAISharp.API
             { 
                 if (SelectedModel != null)
                 {
-                    ModelDetail? _selectedModel = Models.FirstOrDefault(m => m.key.Equals(SelectedModel));
-                    return _selectedModel?.ID;
+                    return SelectedModel.GetDescription();
                 }
                 else
                 {
