@@ -118,7 +118,7 @@ namespace OpenAISharp.API
         public object? logit_bias { get; set; }
         public string? user { get; set; }
         #endregion
-        public static async Task<string> Request(string prompt, Model model = Model.text_davinci_003, string? suffix = null, int? max_tokens = null, decimal? temperature = null, decimal? top_p = null, int? n = null, bool? stream = null, int? logprobs = null, bool? echo = null, string[]? stop = null, decimal? presence_penalty = null, decimal? frequency_penalty = null, int? best_of = null, object? logit_bias = null, string? user = null)
+        public static async Task<string> Request(string prompt, Model model = Model.gpt_3_5_turbo, string? suffix = null, int? max_tokens = null, decimal? temperature = null, decimal? top_p = null, int? n = null, bool? stream = null, int? logprobs = null, bool? echo = null, string[]? stop = null, decimal? presence_penalty = null, decimal? frequency_penalty = null, int? best_of = null, object? logit_bias = null, string? user = null)
         {
             return await Request(new Completions()
             {
