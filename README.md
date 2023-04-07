@@ -47,7 +47,7 @@ Console.ReadLine();
 
 ## Getting Started
 To use this library, you'll need to sign up for an Open AI API key. Then, simply initialize the OpenAISharp class with your API key and start generating text!
-
+### Completion example code
 ``` csharp
 using Newtonsoft.Json;
 using OpenAISharp;
@@ -57,7 +57,23 @@ OpenAIConfiguration.Load();
 
 CompletionsReponse _result = await Completions.Request("what is the best foods for a red wine?");
 Console.WriteLine(_result.error != null ? _result.error.message : _result.choices[0].text);
+```
+### Chat example code
+``` csharp
+using OpenAISharp.API;
+using OpenAISharp;
+using Newtonsoft.Json;
 
+OpenAIConfiguration.Load();
+ChatResponse chatResponse = await Chat.Request(new Chat()
+{
+    messages = new chatformat[] {
+        new chatformat() {  role = chatformat.roles.system, content = "You are a pet behaviorist." },
+        new chatformat() {  role = chatformat.roles.user, content = "I have an aggressive German Shepherd who needs help managing its aggression." }
+    }
+});
+
+Console.WriteLine(chatResponse.error != null ? chatResponse.error.message : JsonConvert.SerializeObject(chatResponse.choices));
 ```
 
 ## Contributing
