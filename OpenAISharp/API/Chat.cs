@@ -94,6 +94,16 @@ namespace OpenAISharp.API
             }
             return ChatResponse;
         }
+        public static async Task<string> Request(string chat)
+        {
+            ChatResponse chatResponse = await Request(new Chat() {
+                messages = new chatformat[]
+                {
+                    new chatformat() { role = chatformat.roles.user, content = chat }
+                }
+            });
+            return chatResponse.error != null ? chatResponse.error.message : chatResponse.choices.FirstOrDefault().message.content;
+        }
         #endregion
 
     }
