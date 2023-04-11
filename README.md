@@ -86,5 +86,14 @@ Console.WriteLine(chatResponse);
 Console.ReadLine();
 ```
 ![Response of Chat.Request](screenshots/response.png)
+
+## Some ideas for future features:
+
+* Easy-to-understand examples for using embeddings
+* Case study examples for fine-tuning models
+* Prompt templates for generating customized text
+* Markdown-to-text and Markdown-to-HTML conversion features
+* Dataset pipeline features for processing and cleaning data
+
 ## Contributing
 Contributions are welcome! Whether you've found a bug, want to add a new feature, or just have a suggestion, feel free to open an issue or pull request.
