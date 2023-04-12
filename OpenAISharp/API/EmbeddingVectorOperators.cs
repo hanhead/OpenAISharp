@@ -49,4 +49,21 @@ namespace OpenAISharp.API
             }
         }
     }
+    public static class EuclideanDistance
+    {
+        public static float Calculate(float[] vector1, float[] vector2)
+        {
+            var context = new MLContext();
+            var data = vector1.Zip(vector2, (v1, v2) => new { v1, v2 });
+            var dataView = context.Data.LoadFromEnumerable(data);
+            var distanceEstimator = context.Transforms.Conversion.ConvertType("v1", outputKind: DataKind.Single)
+                .Append(context.Transforms.Conversion.ConvertType("v2", outputKind: DataKind.Single))
+                .Append(context.Transforms.Concatenate("Features", "v1", "v2"))
+                .Append(context.Transforms.NormalizeLpNorm("Features", "Features"))
+                .Append(context.Transforms.NormalizeMinMax("Features"));
+            var transformedData = distanceEstimator.Fit(dataView).Transform(dataView);
+            var distanceValues = transformedData.GetColumn<float[]>("Features").ToArray();
+            return distanceValues[0][0];
+        }
+    }
 }
