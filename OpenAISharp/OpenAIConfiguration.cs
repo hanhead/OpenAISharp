@@ -34,6 +34,28 @@ namespace OpenAISharp
             OpenAISettings.OrganizationID = openAIConfig.OrganizationID;
             OpenAISettings.ApiKey = openAIConfig.ApiKey;
         }
+        public static string CreateConfig(string organizationID, string apiKey)
+        {
+            string InitializationVectorBase64String = EncryptionUtils.GetNewInitailizationVectorBase64String();
+            TripleDesEncryption tripleDesc = new TripleDesEncryption(EncryptionUtils.GetMacAddress16BytesFormat(), InitializationVectorBase64String);
+
+            var openAIConfiguration = new
+            {
+                OpenAI = new OpenAIConfiguration()
+                {
+                    UrlPrefix = "https://api.openai.com/v1",
+                    InitializationVectorBase64String = InitializationVectorBase64String,
+                    EncryptedOrgID = tripleDesc.Encrypt(organizationID),
+                    EncryptedApiKey = tripleDesc.Encrypt(apiKey)
+                }
+            };
+            string _json = JsonConvert.SerializeObject(openAIConfiguration, Formatting.Indented);
+            return _json;
+        }
+        public static void CreateConfigFile(string organizationID, string apiKey, string appSettingsJsonFilePath  = "appsettings.json")
+        {
+            System.IO.File.WriteAllText(appSettingsJsonFilePath, CreateConfig(organizationID, apiKey));
+        }
         public string InitializationVectorBase64String {
             get
             {
