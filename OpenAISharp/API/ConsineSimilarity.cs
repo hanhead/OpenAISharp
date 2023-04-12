@@ -1,12 +1,5 @@
 ﻿using Microsoft.ML;
 using Microsoft.ML.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.ML.Transforms;
-using static Microsoft.ML.Transforms.LpNormNormalizingEstimatorBase;
 
 namespace OpenAISharp.API
 {
