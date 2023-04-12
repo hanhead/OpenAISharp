@@ -55,7 +55,7 @@ using OpenAISharp.API;
 using OpenAISharp;
 using Newtonsoft.Json;
 
-OpenAIConfiguration.Load();
+OpenAIConfiguration.Load(); 
 ChatResponse chatResponse = await Chat.Request(new Chat()
 {
     messages = new chatformat[] {
@@ -78,6 +78,35 @@ Console.ReadLine();
 ```
 ![Response of Chat.Request](screenshots/response.png)
 
+## OpenAI's GPT Embedding Vector
+
+OpenAI's GPT embedding vector is a numerical representation of words and phrases in a 768-dimensional space. It is trained on a large and diverse corpus of text data, making it exceptional in its ability to encode the meaning of language. The GPT embedding vector is used in a wide range of natural language processing tasks, as well as recommendation systems and anomaly detection.
+
+### Usage Examples
+
+Here are some examples of how to use OpenAI's GPT embedding vector in your projects:
+
+#### Create GPT Embedding Vector
+``` csharp
+// Not implemented
+```
+
+#### Search with Cosine Similarity
+``` csharp
+// Not implemented
+```
+
+#### Save to Vector Database (RedisAI)
+``` csharp
+// Not implemented
+```
+
+#### Recommendation with Vector Database
+``` csharp
+// Not implemented
+```
+
+
 ## Some ideas for future features:
 
 * Easy-to-understand examples for using embeddings
@@ -85,6 +114,8 @@ Console.ReadLine();
 * Prompt templates for generating customized text
 * Markdown-to-text and Markdown-to-HTML conversion features
 * Dataset pipeline features for processing and cleaning data
+
+
 
 ## Contributing
 Contributions are welcome! Whether you've found a bug, want to add a new feature, or just have a suggestion, feel free to open an issue or pull request.
