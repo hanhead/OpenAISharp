@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -11,6 +11,9 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/hanhead/OpenAISharp</RepositoryUrl>
     <PackageTags>Open AI;Chat GPT;machine learning;ai;gpt;</PackageTags>
+    <AssemblyVersion>1.0.1</AssemblyVersion>
+    <FileVersion>1.0.1</FileVersion>
+	  <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
