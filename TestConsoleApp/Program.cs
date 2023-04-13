@@ -1,11 +1,12 @@
-﻿using OpenAISharp;
+﻿using Newtonsoft.Json;
+using OpenAISharp;
 using OpenAISharp.API;
 
 //CreateConfig();
 //await CompletionsExample();
 //await ChatExampleRaw();
 //await ChatExample()
-
+//MarkdownUtils();
 
 static void CreateConfig()
 {
@@ -47,3 +48,9 @@ static async Task ChatExample()
     Console.ReadLine();
 }
 
+static void MarkdownUtils()
+{
+    string markdowncontent = System.IO.File.ReadAllText("readme.md");
+    Console.WriteLine(markdowncontent.MarkdownToText());
+    Console.WriteLine(markdowncontent.MarkdownToHtml());
+}
