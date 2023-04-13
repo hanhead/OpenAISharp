@@ -33,12 +33,15 @@ OpenAIConfiguration.CreateConfigFile(orgid, apikey);
 Console.WriteLine("appsettings.json file is created.");
 Console.ReadLine();
 ```
+
 ![new configuration console screen](screenshots/configconsole.png)
 ![New appsettings.json file](screenshots/newconfig.png)
 
 ## Getting Started
 To use this library, you'll need to sign up for an Open AI API key. Then, simply initialize the OpenAISharp class with your API key and start generating text!
+
 ### Completion example code
+
 ``` csharp
 using Newtonsoft.Json;
 using OpenAISharp;
@@ -50,6 +53,7 @@ CompletionsReponse _result = await Completions.Request("what is the best foods f
 Console.WriteLine(_result.error != null ? _result.error.message : _result.choices[0].text);
 ```
 ### Chat example code
+
 ``` csharp
 using OpenAISharp.API;
 using OpenAISharp;
@@ -66,6 +70,7 @@ ChatResponse chatResponse = await Chat.Request(new Chat()
 
 Console.WriteLine(chatResponse.error != null ? chatResponse.error.message : JsonConvert.SerializeObject(chatResponse.choices));
 ```
+
 ``` csharp
 using OpenAISharp.API;
 using OpenAISharp;
@@ -76,46 +81,58 @@ string chatResponse = await Chat.Request("I want you to act as a travel guide. I
 Console.WriteLine(chatResponse);
 Console.ReadLine();
 ```
+
 ![Response of Chat.Request](screenshots/response.png)
 
-## OpenAI's GPT Embedding Vector
+### OpenAI's GPT Embedding Vector
 
 OpenAI's GPT embedding vector is a numerical representation of words and phrases in a 768-dimensional space. It is trained on a large and diverse corpus of text data, making it exceptional in its ability to encode the meaning of language. The GPT embedding vector is used in a wide range of natural language processing tasks, as well as recommendation systems and anomaly detection.
 
-### Usage Examples
+#### Usage Examples
 
 Here are some examples of how to use OpenAI's GPT embedding vector in your projects:
 
-#### Create GPT Embedding Vector
+##### Create GPT Embedding Vector
+
 ``` csharp
 // Not implemented
 ```
 
-#### Search with Cosine Similarity
+##### Search with Cosine Similarity
+
 ``` csharp
 // Not implemented
 ```
 
-#### Save to Vector Database (RedisAI)
+##### Save to Vector Database (RedisAI)
+
 ``` csharp
 // Not implemented
 ```
 
-#### Recommendation with Vector Database
+##### Recommendation with Vector Database
+
 ``` csharp
 // Not implemented
 ```
 
+### Markdown utils example
+
+``` csharp
+    string markdowncontent = System.IO.File.ReadAllText("readme.md");
+    Console.WriteLine(markdowncontent.MarkdownToText());
+    Console.WriteLine(markdowncontent.MarkdownToHtml());
+```
 
 ## Some ideas for future features:
 
 * Easy-to-understand examples for using embeddings
 * Case study examples for fine-tuning models
 * Prompt templates for generating customized text
-* Markdown-to-text and Markdown-to-HTML conversion features
 * Dataset pipeline features for processing and cleaning data
 
 
 
 ## Contributing
+
 Contributions are welcome! Whether you've found a bug, want to add a new feature, or just have a suggestion, feel free to open an issue or pull request.
