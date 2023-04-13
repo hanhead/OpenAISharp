@@ -7,6 +7,7 @@ using OpenAISharp.API;
 //await ChatExampleRaw();
 //await ChatExample()
 //MarkdownUtils();
+await ModerationsExample();
 
 static void CreateConfig()
 {
@@ -53,4 +54,14 @@ static void MarkdownUtils()
     string markdowncontent = System.IO.File.ReadAllText("readme.md");
     Console.WriteLine(markdowncontent.MarkdownToText());
     Console.WriteLine(markdowncontent.MarkdownToHtml());
+}
+
+static async Task ModerationsExample()
+{
+    OpenAIConfiguration.Load();
+    Console.WriteLine("Input text:");
+    string input = Console.ReadLine();
+    bool result = await Moderations.isViolated(input);
+    Console.WriteLine(result ? "Violated" : "Pass");
+    Console.ReadLine();
 }
