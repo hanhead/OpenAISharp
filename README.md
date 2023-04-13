@@ -31,8 +31,8 @@ Console.WriteLine("appsettings.json file is created.");
 Console.ReadLine();
 ```
 
-![new configuration console screen](screenshots/configconsole.png)
-![New appsettings.json file](screenshots/newconfig.png)
+![new configuration console screen](https://raw.githubusercontent.com/hanhead/OpenAISharp/master/screenshots/configconsole.png)
+![New appsettings.json file](https://raw.githubusercontent.com/hanhead/OpenAISharp/master/screenshots/newconfig.png)
 
 ## Getting Started
 To use this library, you'll need to sign up for an Open AI API key. Then, simply initialize the OpenAISharp class with your API key and start generating text!
@@ -62,7 +62,7 @@ Console.WriteLine(chatResponse);
 Console.ReadLine();
 ```
 
-![Response of Chat.Request](screenshots/response.png)
+![Response of Chat.Request](https://raw.githubusercontent.com/hanhead/OpenAISharp/master/screenshots/response.png)
 
 ``` csharp
 using OpenAISharp.API;
