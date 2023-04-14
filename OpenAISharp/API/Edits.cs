@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.ComponentModel;
 using System.Runtime.Serialization;
 using System.Text;
 
@@ -9,13 +10,13 @@ namespace OpenAISharp.API
         private static string command = "/edits";
         public enum AvailableModel
         {
-            [EnumMember(Value = "text-davinci-edit-001")]
+            [Description("text-davinci-edit-001")]
             text_davinci_edit_001,
-            [EnumMember(Value = "code-davinci-edit-001")]
+            [Description("code-davinci-edit-001")]
             code_davinci_edit_001
         }
         [JsonIgnore]
-        public AvailableModel? SelectedModel { get; set; }
+        public AvailableModel SelectedModel { get; set; }
 
         private string _model;
         public string model
@@ -24,7 +25,7 @@ namespace OpenAISharp.API
             {
                 if (SelectedModel != null)
                 {
-                    return SelectedModel.ToString();
+                    return SelectedModel.GetDescription();
                 }
                 else
                 {
@@ -41,6 +42,16 @@ namespace OpenAISharp.API
         public int? n { get; set; }
         public decimal? temperature { get; set; }
         public decimal? top_p { get; set; }
+
+        public static async Task<string> Request(string input, string instruction, AvailableModel selectedModel = AvailableModel.text_davinci_edit_001)
+        {
+            EditsResponse editsResponse = await Request(new Edits() { 
+                SelectedModel = selectedModel,
+                input = input,
+                instruction = instruction
+            });
+            return editsResponse.error != null ? editsResponse.error.message : editsResponse.choices[0].text;
+        }
         public static async Task<EditsResponse> Request(Edits edits)
         {
             EditsResponse editsResponse = null;
