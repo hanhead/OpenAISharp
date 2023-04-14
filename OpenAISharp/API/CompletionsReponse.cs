@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static OpenAISharp.API.Completions;
-
-namespace OpenAISharp.API
+﻿namespace OpenAISharp.API
 {
     public class CompletionsReponse
     {

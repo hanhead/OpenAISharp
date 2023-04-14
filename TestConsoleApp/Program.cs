@@ -1,13 +1,13 @@
 ﻿using Newtonsoft.Json;
 using OpenAISharp;
 using OpenAISharp.API;
-
 //CreateConfig();
+//await GetAllModels();
 //await CompletionsExample();
 //await ChatExampleRaw();
 //await ChatExample()
 //MarkdownUtils();
-await ModerationsExample();
+//await ModerationsExample();
 
 static void CreateConfig()
 {
@@ -17,6 +17,19 @@ static void CreateConfig()
     string apikey = Console.ReadLine();
     OpenAIConfiguration.CreateConfigFile(orgid, apikey);
     Console.WriteLine("appsettings.json file is created.");
+    Console.ReadLine();
+}
+
+static async Task GetAllModels()
+{
+    OpenAIConfiguration.Load();
+    Models models = await Models.List();
+    foreach (var model in models.data)
+    {
+        Console.WriteLine(model.id);
+        Console.WriteLine(model.@object);
+        Console.WriteLine("");
+    }
     Console.ReadLine();
 }
 
