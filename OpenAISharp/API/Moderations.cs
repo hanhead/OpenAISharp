@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.ComponentModel;
 using System.Runtime.Serialization;
 using System.Text;
 
@@ -9,9 +10,9 @@ namespace OpenAISharp.API
         private static string command = "/moderations";
         public enum AvailableModel
         {
-            [EnumMember(Value = "text-moderation-stable")]
+            [Description("text-moderation-stable")]
             text_moderation_stable,
-            [EnumMember(Value = "text-moderation-latest")]
+            [Description("text-moderation-latest")]
             text_moderation_latest
         }
         public string input { get; set; }
@@ -43,7 +44,7 @@ namespace OpenAISharp.API
                 string requestJson = JsonConvert.SerializeObject(new Moderations 
                 { 
                     input = input, 
-                    model = model==null?null:model.ToString()
+                    model = model==null?null:model.Value.GetDescription()
                 }, Formatting.Indented, new JsonSerializerSettings
                 {
                     NullValueHandling = NullValueHandling.Ignore

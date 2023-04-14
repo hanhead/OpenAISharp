@@ -82,11 +82,9 @@ Console.WriteLine(chatResponse.error != null ? chatResponse.error.message : Json
 ```
 ### Moderations
 
-The moderation feature of OpenAI API is free, but a quota must be available to use it. This is an excellent tool for checking user-generated content and comments for violations. However, please note that the "model" parameter should be set to null. As of 4/13/2023, the OpenAI documentation does not currently include any available models.
+The moderation feature of OpenAI API is free, but a quota must be available to use it. This is an excellent tool for checking user-generated content and comments for violations.
 
 ![Free moderation API](https://raw.githubusercontent.com/hanhead/OpenAISharp/master/screenshots/free_moderaion_api.png)
-
-![Now not available models](https://raw.githubusercontent.com/hanhead/OpenAISharp/master/screenshots/now_not_avilable_models.png)
 
 ``` csharp
 using OpenAISharp.API;
