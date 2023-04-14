@@ -153,8 +153,56 @@ Console.ReadLine();
 ##### Search with Cosine Similarity
 
 ``` csharp
-// Not implemented
+using Newtonsoft.Json;
+using OpenAISharp;
+using OpenAISharp.API;
+
+OpenAIConfiguration.Load();
+
+//await PrepareMyEmbeddingVectorDatabase();
+List<MyEmbeddingVectorData> preparedTexts = JsonConvert.DeserializeObject<List<MyEmbeddingVectorData>>(System.IO.File.ReadAllText("myTexts.json"));
+
+string query = "The quick brown fox";
+double[] queryEmbeddingVector = await Embeddings.Request(query);
+
+foreach (MyEmbeddingVectorData t in preparedTexts)
+{
+    t.CosineSimilarity = CosineSimilarity.Calculate(t.EmbeddingVector, queryEmbeddingVector);
+    t.EuclideanDistance = EuclideanDistance.Calculate(t.EmbeddingVector, queryEmbeddingVector);
+}
+Console.WriteLine("Most similar text is:");
+Console.WriteLine(preparedTexts.OrderByDescending(t=>t.CosineSimilarity).First().Text);
+Console.ReadLine();
+
+static async Task PrepareMyEmbeddingVectorDatabase()
+{
+    List<MyEmbeddingVectorData> myTexts = new List<MyEmbeddingVectorData>
+    {
+        new MyEmbeddingVectorData() { Text = "The quick brown fox jumps over the lazy dog." },
+        new MyEmbeddingVectorData() { Text = "The quick brown fox jumps over the lazy cat." },
+        new MyEmbeddingVectorData() { Text = "The lazy dog jumps over the quick brown fox." },
+        new MyEmbeddingVectorData() { Text = "The quick brown fox runs fast." },
+        new MyEmbeddingVectorData() { Text = "The lazy cat sleeps all day." },
+        new MyEmbeddingVectorData() { Text = "The quick brown dog barks at the lazy cat." }
+    };
+
+    List<double[]> queryEmbeddingVectors = await Embeddings.Request(myTexts.Select(t => t.Text).ToArray());
+    for (int i = 0; i < queryEmbeddingVectors.Count; i++)
+    {
+        myTexts[i].EmbeddingVector = queryEmbeddingVectors[i];
+    }
+    System.IO.File.WriteAllText("myTexts.json", JsonConvert.SerializeObject(myTexts));
+}
+class MyEmbeddingVectorData
+{
+    public string Text { get; set; }
+    public double[] EmbeddingVector { get; set; }
+    public double CosineSimilarity { get; set; }
+    public double EuclideanDistance { get; set; }
+}
 ```
+
+![search with open ai embedding and cosine similarity](https://raw.githubusercontent.com/hanhead/OpenAISharp/master/screenshots/search_with_open_ai_embedding_and_cosine_similarity.png)
 
 ##### Save to Vector Database (RedisAI)
 
