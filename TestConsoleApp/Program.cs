@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using OpenAISharp;
 using OpenAISharp.API;
-
+#region archived
 //CreateConfig();
 //await GetAllModels();
 //await CompletionsExample();
@@ -9,9 +9,17 @@ using OpenAISharp.API;
 //await ChatExample()
 //MarkdownUtils();
 //await ModerationsExample();
-await EditsExample1();
+//await EditsExample1();
 //await EditExample2();
+#endregion
 
+OpenAIConfiguration.Load();
+var response = await Embeddings.Request(new Embeddings() { SelectedModel = Embeddings.AvailableModel.text_embedding_ada_002, input = new string[] { "The food was delicious and the waiter." } });
+Console.WriteLine(JsonConvert.SerializeObject(response));
+Console.ReadLine();
+
+
+#region archived
 static void CreateConfig()
 {
     Console.WriteLine("Input your Organization ID:");
@@ -22,7 +30,6 @@ static void CreateConfig()
     Console.WriteLine("appsettings.json file is created.");
     Console.ReadLine();
 }
-
 static async Task GetAllModels()
 {
     OpenAIConfiguration.Load();
@@ -35,7 +42,6 @@ static async Task GetAllModels()
     }
     Console.ReadLine();
 }
-
 static async Task CompletionsExample()
 {
     OpenAIConfiguration.Load();
@@ -64,14 +70,12 @@ static async Task ChatExample()
     Console.WriteLine(chatResponse);
     Console.ReadLine();
 }
-
 static void MarkdownUtils()
 {
     string markdowncontent = System.IO.File.ReadAllText("readme.md");
     Console.WriteLine(markdowncontent.MarkdownToText());
     Console.WriteLine(markdowncontent.MarkdownToHtml());
 }
-
 static async Task ModerationsExample()
 {
     OpenAIConfiguration.Load();
@@ -81,7 +85,6 @@ static async Task ModerationsExample()
     Console.WriteLine(result ? "Violated" : "Pass");
     Console.ReadLine();
 }
-
 static async Task EditsExample1()
 {
     OpenAIConfiguration.Load();
@@ -89,10 +92,10 @@ static async Task EditsExample1()
     Console.WriteLine(JsonConvert.SerializeObject(response));
     Console.ReadLine();
 }
-
 static async Task EditExample2()
 {
     OpenAIConfiguration.Load();
     Console.Write(await Edits.Request("What day of the wek is it?", "Fix the spelling mistakes"));
     Console.ReadLine();
 }
+#endregion
