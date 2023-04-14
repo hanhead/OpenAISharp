@@ -15,12 +15,12 @@ namespace OpenAISharp.API
             [Description("text-moderation-latest")]
             text_moderation_latest
         }
-        public string input { get; set; }
+        public string[] input { get; set; }
         public string model { get; set; }
         
         public static async Task<bool> isViolated(string input, AvailableModel? model = null)
         {
-            ModerationsResponse response = await Request(input, model);
+            ModerationsResponse response = await Request(new string[] { input }, model);
             if (response.error == null)
             {
                 return response.results.Count(r => r.flagged == true) > 0;
@@ -30,7 +30,7 @@ namespace OpenAISharp.API
                 throw new Exception(response.error.message);
             }
         }
-        public static async Task<ModerationsResponse> Request(string input, AvailableModel? model = null)
+        public static async Task<ModerationsResponse> Request(string[] input, AvailableModel? model = null)
         {
             ModerationsResponse moderationsResponse = null;
             string result;
