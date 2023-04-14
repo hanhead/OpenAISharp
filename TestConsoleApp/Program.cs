@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using OpenAISharp;
 using OpenAISharp.API;
+
 //CreateConfig();
 //await GetAllModels();
 //await CompletionsExample();
@@ -8,6 +9,8 @@ using OpenAISharp.API;
 //await ChatExample()
 //MarkdownUtils();
 //await ModerationsExample();
+await EditsExample1();
+//await EditExample2();
 
 static void CreateConfig()
 {
@@ -23,7 +26,7 @@ static void CreateConfig()
 static async Task GetAllModels()
 {
     OpenAIConfiguration.Load();
-    Models models = await Models.List();
+    Models models = await Models.List(true);
     foreach (var model in models.data)
     {
         Console.WriteLine(model.id);
@@ -74,7 +77,22 @@ static async Task ModerationsExample()
     OpenAIConfiguration.Load();
     Console.WriteLine("Input text:");
     string input = Console.ReadLine();
-    bool result = await Moderations.isViolated(input);
+    bool result = await Moderations.isViolated(input, Moderations.AvailableModel.text_moderation_latest);
     Console.WriteLine(result ? "Violated" : "Pass");
+    Console.ReadLine();
+}
+
+static async Task EditsExample1()
+{
+    OpenAIConfiguration.Load();
+    EditsResponse response = await Edits.Request(new Edits() { SelectedModel = Edits.AvailableModel.text_davinci_edit_001, input = "Hello! My name is ChatGPT. It is a pleasure to have the opportunity to communicate with you today. Is there anything I can assist you with?", instruction = "change tone of Snoop Dogg", temperature = 0.7M });
+    Console.WriteLine(JsonConvert.SerializeObject(response));
+    Console.ReadLine();
+}
+
+static async Task EditExample2()
+{
+    OpenAIConfiguration.Load();
+    Console.Write(await Edits.Request("What day of the wek is it?", "Fix the spelling mistakes"));
     Console.ReadLine();
 }
