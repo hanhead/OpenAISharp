@@ -80,6 +80,35 @@ ChatResponse chatResponse = await Chat.Request(new Chat()
 
 Console.WriteLine(chatResponse.error != null ? chatResponse.error.message : JsonConvert.SerializeObject(chatResponse.choices));
 ```
+
+### Edits example codes
+
+``` csharp
+using OpenAISharp.API;
+using OpenAISharp;
+
+OpenAIConfiguration.Load();
+EditsResponse response = await Edits.Request(new Edits() { SelectedModel = Edits.AvailableModel.text_davinci_edit_001, input = "Hello! My name is ChatGPT. It is a pleasure to have the opportunity to communicate with you today. Is there anything I can assist you with?", instruction = "change tone of Snoop Dogg", temperature = 0.7M });
+Console.WriteLine(JsonConvert.SerializeObject(response));
+Console.ReadLine();
+```
+
+![Response of Edits.Request 2](https://raw.githubusercontent.com/hanhead/OpenAISharp/master/screenshots/edits_response_2.png)
+
+``` csharp
+using OpenAISharp.API;
+using OpenAISharp;
+using Newtonsoft.Json;
+
+OpenAIConfiguration.Load();
+EditsResponse response = await Edits.Request(new Edits() { SelectedModel = Edits.AvailableModel.text_davinci_edit_001, input = "Hello! My name is ChatGPT. It is a pleasure to have the opportunity to communicate with you today. Is there anything I can assist you with?", instruction = "change tone of Snoop Dogg", temperature = 0.7M });
+Console.WriteLine(JsonConvert.SerializeObject(response));
+Console.ReadLine();
+```
+
+![Response of Edits.Request 1](https://raw.githubusercontent.com/hanhead/OpenAISharp/master/screenshots/edits_response_1.png)
+
+
 ### Moderations
 
 The moderation feature of OpenAI API is free, but a quota must be available to use it. This is an excellent tool for checking user-generated content and comments for violations.
