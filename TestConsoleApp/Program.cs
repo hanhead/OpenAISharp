@@ -13,11 +13,8 @@ using OpenAISharp.API;
 //await EditExample2();
 #endregion
 
-OpenAIConfiguration.Load();
-var response = await Embeddings.Request(new Embeddings() { SelectedModel = Embeddings.AvailableModel.text_embedding_ada_002, input = new string[] { "The food was delicious and the waiter." } });
-Console.WriteLine(JsonConvert.SerializeObject(response));
-Console.ReadLine();
-
+//await EmbeddingsExample();
+await CosineSimilaritySearchExample();
 
 #region archived
 static void CreateConfig()
@@ -98,4 +95,58 @@ static async Task EditExample2()
     Console.Write(await Edits.Request("What day of the wek is it?", "Fix the spelling mistakes"));
     Console.ReadLine();
 }
+static async Task EmbeddingsExample()
+{
+    OpenAIConfiguration.Load();
+    var response = await Embeddings.Request(new Embeddings() { SelectedModel = Embeddings.AvailableModel.text_embedding_ada_002, input = new string[] { "The food was delicious and the waiter." } });
+    Console.WriteLine(JsonConvert.SerializeObject(response));
+    Console.ReadLine();
+}
+static async Task PrepareMyEmbeddingVectorDatabase()
+{
+    List<MyEmbeddingVectorData> myTexts = new List<MyEmbeddingVectorData>
+    {
+        new MyEmbeddingVectorData() { Text = "The quick brown fox jumps over the lazy dog." },
+        new MyEmbeddingVectorData() { Text = "The quick brown fox jumps over the lazy cat." },
+        new MyEmbeddingVectorData() { Text = "The lazy dog jumps over the quick brown fox." },
+        new MyEmbeddingVectorData() { Text = "The quick brown fox runs fast." },
+        new MyEmbeddingVectorData() { Text = "The lazy cat sleeps all day." },
+        new MyEmbeddingVectorData() { Text = "The quick brown dog barks at the lazy cat." }
+    };
+
+    List<double[]> queryEmbeddingVectors = await Embeddings.Request(myTexts.Select(t => t.Text).ToArray());
+    for (int i = 0; i < queryEmbeddingVectors.Count; i++)
+    {
+        myTexts[i].EmbeddingVector = queryEmbeddingVectors[i];
+    }
+    System.IO.File.WriteAllText("myTexts.json", JsonConvert.SerializeObject(myTexts));
+}
+static async Task CosineSimilaritySearchExample()
+{
+    OpenAIConfiguration.Load();
+
+    //await PrepareMyEmbeddingVectorDatabase();
+    List<MyEmbeddingVectorData> preparedTexts = JsonConvert.DeserializeObject<List<MyEmbeddingVectorData>>(System.IO.File.ReadAllText("myTexts.json"));
+
+    string query = "The quick brown fox";
+    double[] queryEmbeddingVector = await Embeddings.Request(query);
+
+    foreach (MyEmbeddingVectorData t in preparedTexts)
+    {
+        t.CosineSimilarity = CosineSimilarity.Calculate(t.EmbeddingVector, queryEmbeddingVector);
+        t.EuclideanDistance = EuclideanDistance.Calculate(t.EmbeddingVector, queryEmbeddingVector);
+    }
+    Console.WriteLine("Most similar text is:");
+    Console.WriteLine(preparedTexts.OrderByDescending(t => t.CosineSimilarity).First().Text);
+    Console.ReadLine();
+}
+class MyEmbeddingVectorData
+{
+    public string Text { get; set; }
+    public double[] EmbeddingVector { get; set; }
+    public double CosineSimilarity { get; set; }
+    public double EuclideanDistance { get; set; }
+}
 #endregion
+
+
