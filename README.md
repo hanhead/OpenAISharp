@@ -168,7 +168,6 @@ double[] queryEmbeddingVector = await Embeddings.Request(query);
 foreach (MyEmbeddingVectorData t in preparedTexts)
 {
     t.CosineSimilarity = CosineSimilarity.Calculate(t.EmbeddingVector, queryEmbeddingVector);
-    t.EuclideanDistance = EuclideanDistance.Calculate(t.EmbeddingVector, queryEmbeddingVector);
 }
 Console.WriteLine("Most similar text is:");
 Console.WriteLine(preparedTexts.OrderByDescending(t=>t.CosineSimilarity).First().Text);
@@ -198,7 +197,6 @@ class MyEmbeddingVectorData
     public string Text { get; set; }
     public double[] EmbeddingVector { get; set; }
     public double CosineSimilarity { get; set; }
-    public double EuclideanDistance { get; set; }
 }
 ```
 
