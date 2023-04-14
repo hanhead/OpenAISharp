@@ -138,8 +138,17 @@ Here are some examples of how to use OpenAI's GPT embedding vector in your proje
 ##### Create GPT Embedding Vector
 
 ``` csharp
-// Not implemented
+using OpenAISharp.API;
+using OpenAISharp;
+using Newtonsoft.Json;
+
+OpenAIConfiguration.Load();
+var response = await Embeddings.Request(new Embeddings() { SelectedModel = Embeddings.AvailableModel.text_embedding_ada_002, input = new string[] { "The food was delicious and the waiter." } });
+Console.WriteLine(JsonConvert.SerializeObject(response));
+Console.ReadLine();
 ```
+
+![Response of Creating embedding vector](https://raw.githubusercontent.com/hanhead/OpenAISharp/master/screenshots/embeddings_response1.png)
 
 ##### Search with Cosine Similarity
 
