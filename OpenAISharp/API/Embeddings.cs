@@ -61,5 +61,27 @@ namespace OpenAISharp.API
             }
             return embeddingsResponse;
         }
+        public static async Task<List<double[]>> Request(string[] input, AvailableModel model = AvailableModel.text_embedding_ada_002)
+        {
+            Embeddings embeddings = new Embeddings() { input = input, SelectedModel =  model};
+            EmbeddingsResponse response = await Request(embeddings);
+            if (response != null)
+            {
+                if (response.error == null)
+                {
+                    return response.data.Select(d=>d.embedding).ToList();
+                }
+                else
+                {
+                    throw new Exception(response.error.message);
+                }
+            }
+            return null;
+        }
+        public static async Task<double[]> Request(string input, AvailableModel model = AvailableModel.text_embedding_ada_002)
+        {
+            List<double[]> result = await Request(new string[] { input }, model);
+            return result.FirstOrDefault();
+        }
     }
 }
