@@ -1,6 +1,9 @@
 ﻿using Newtonsoft.Json;
 using OpenAISharp;
 using OpenAISharp.API;
+using StackExchange.Redis;
+using NRedisStack;
+
 #region archived
 //CreateConfig();
 //await GetAllModels();
@@ -11,10 +14,12 @@ using OpenAISharp.API;
 //await ModerationsExample();
 //await EditsExample1();
 //await EditExample2();
+//await EmbeddingsExample();
+//await CosineSimilaritySearchExample();
 #endregion
 
-//await EmbeddingsExample();
-await CosineSimilaritySearchExample();
+SetAndGetEmbeddingsToRedisAI();
+Console.ReadLine();
 
 #region archived
 static void CreateConfig()
@@ -138,6 +143,26 @@ static async Task CosineSimilaritySearchExample()
     Console.WriteLine("Most similar text is:");
     Console.WriteLine(preparedTexts.OrderByDescending(t => t.CosineSimilarity).First().Text);
     Console.ReadLine();
+}
+static void SetAndGetEmbeddingsToRedisAI()
+{
+    OpenAIConfiguration.Load();
+    List<MyEmbeddingVectorData> preparedTexts = JsonConvert.DeserializeObject<List<MyEmbeddingVectorData>>(System.IO.File.ReadAllText("myTexts.json"));
+    double[] embedding = Embeddings.Request("The quick brown fox jumps over the lazy dog.", Embeddings.AvailableModel.text_embedding_ada_002).Result;
+    string tensorName = "embedding:" + Guid.NewGuid().ToString();
+
+    // RedisAI: https://cloudinfrastructureservices.co.uk/how-to-install-redis-on-windows-10-11-step-by-step-tutorial/
+    // 1. To use RedisAI, you install Docker.
+    // 2. After installing Docker, run the command "docker run -d --name redisai -p 6379:6379 redislabs/redisai:edge-cpu-bionic" to start the RedisAI container.
+    // 3. Finally, you need to install the necessary NuGet packages: StackExchange.Redis and NRedisStack, to use RedisAI in your .NET Core C# project.
+
+    string server = "localhost";
+    ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(server);
+    IDatabase db = redis.GetDatabase();
+    RedisAIUtils.TensorSet(db, tensorName, embedding.Select(v => (object)v).ToList(), RedisAIUtils.TensorInputDataType.DOUBLE, RedisAIUtils.TensorInputType.VALUES);
+    Console.WriteLine(tensorName);
+    Console.WriteLine(JsonConvert.SerializeObject(RedisAIUtils.TensorGet<double>(db, tensorName, RedisAIUtils.TensorOutputType.VALUES)));
+    redis.Close();
 }
 class MyEmbeddingVectorData
 {
