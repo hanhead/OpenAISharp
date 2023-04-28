@@ -232,6 +232,8 @@ Console.ReadLine();
 
 ```
 
+![Set and Get Embeddings To RedisAI](https://raw.githubusercontent.com/hanhead/OpenAISharp/master/screenshots/redis_ai_tensor_set_get.png)
+
 ##### Recommendation with Vector Database
 
 ``` csharp
