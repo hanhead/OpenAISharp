@@ -216,7 +216,7 @@ List<MyEmbeddingVectorData> preparedTexts = JsonConvert.DeserializeObject<List<M
 double[] embedding = Embeddings.Request("The quick brown fox jumps over the lazy dog.", Embeddings.AvailableModel.text_embedding_ada_002).Result;
 string tensorName = "embedding:" + Guid.NewGuid().ToString();
 
-// RedisAI: https://cloudinfrastructureservices.co.uk/how-to-install-redis-on-windows-10-11-step-by-step-tutorial/
+// RedisAI: https://oss.redis.com/redisai/
 // 1. To use RedisAI, you install Docker.
 // 2. After installing Docker, run the command "docker run -d --name redisai -p 6379:6379 redislabs/redisai:edge-cpu-bionic" to start the RedisAI container.
 // 3. Finally, you need to install the necessary NuGet packages: StackExchange.Redis and NRedisStack, to use RedisAI in your .NET Core C# project.
