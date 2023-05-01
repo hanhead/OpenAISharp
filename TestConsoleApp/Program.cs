@@ -18,7 +18,17 @@ using NRedisStack;
 //await CosineSimilaritySearchExample();
 #endregion
 
-SetAndGetEmbeddingsToRedisAI();
+using Newtonsoft.Json;
+using OpenAISharp;
+using OpenAISharp.API;
+using StackExchange.Redis;
+using NRedisStack;
+using System;
+
+ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
+IDatabase db = redis.GetDatabase();
+
+redis.Close();
 Console.ReadLine();
 
 #region archived
@@ -147,7 +157,6 @@ static async Task CosineSimilaritySearchExample()
 static void SetAndGetEmbeddingsToRedisAI()
 {
     OpenAIConfiguration.Load();
-    List<MyEmbeddingVectorData> preparedTexts = JsonConvert.DeserializeObject<List<MyEmbeddingVectorData>>(System.IO.File.ReadAllText("myTexts.json"));
     double[] embedding = Embeddings.Request("The quick brown fox jumps over the lazy dog.", Embeddings.AvailableModel.text_embedding_ada_002).Result;
     string tensorName = "embedding:" + Guid.NewGuid().ToString();
 

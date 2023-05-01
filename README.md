@@ -212,7 +212,6 @@ using StackExchange.Redis;
 using NRedisStack;
 
 OpenAIConfiguration.Load();
-List<MyEmbeddingVectorData> preparedTexts = JsonConvert.DeserializeObject<List<MyEmbeddingVectorData>>(System.IO.File.ReadAllText("myTexts.json"));
 double[] embedding = Embeddings.Request("The quick brown fox jumps over the lazy dog.", Embeddings.AvailableModel.text_embedding_ada_002).Result;
 string tensorName = "embedding:" + Guid.NewGuid().ToString();
 
