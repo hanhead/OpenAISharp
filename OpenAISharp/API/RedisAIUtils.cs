@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NRedisStack;
 using NRedisStack.RedisStackCommands;
+using OpenAISharp.API.RedisUtils;
 using StackExchange.Redis;
 
 namespace OpenAISharp.API
@@ -97,28 +98,10 @@ namespace OpenAISharp.API
             db.Execute(serializedCommand);
         }
 
-        public static List<T> TensorGet<T>(IDatabase db, string key, TensorOutputType returnType)
+        public static List<object> TensorGet<T>(IDatabase db, string key, TensorOutputType returnType)
         {
             RedisResult tensorResult = db.Execute(AI.TENSORGET.GetDescription(), key, returnType.ToString());
-            return GetRedisResult<T>(tensorResult);
+            return Utils.GetRedisResult(tensorResult);
         }
-
-        public static List<T> GetRedisResult<T>(RedisResult tensorResult)
-        {
-            var result = new List<T>();
-            if (tensorResult.Type is ResultType.MultiBulk)
-            {
-                return ((RedisResult[]?)tensorResult).Select(r => GetRedisSingleResult<T>(r)).ToList();
-            }
-            else
-            {
-                return new List<T>() { GetRedisSingleResult<T>(tensorResult) };
-            }
-        }
-        public static T GetRedisSingleResult<T>(RedisResult tensorResult)
-        {
-            return (T)(tensorResult.IsNull ? null : Convert.ChangeType(tensorResult, typeof(T)));
-        }
-
     }
 }

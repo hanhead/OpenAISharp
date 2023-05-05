@@ -15,7 +15,7 @@ namespace OpenAISharp.API
         public class Datum
         {
             public string @object { get; set; }
-            public double[] embedding { get; set; }
+            public float[] embedding { get; set; }
             public int index { get; set; }
         }
         public Error error { get; set; }

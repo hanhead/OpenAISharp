@@ -5,16 +5,16 @@ namespace OpenAISharp.API
 {
     public static class CosineSimilarity
     {
-        public static double Calculate(double[] vector1, double[] vector2)
+        public static float Calculate(float[] vector1, float[] vector2)
         {
             if (vector1.Length != vector2.Length)
             {
                 throw new ArgumentException("Vectors must have the same dimensionality.");
             }
 
-            double dotProduct = 0;
-            double normA = 0;
-            double normB = 0;
+            float dotProduct = 0;
+            float normA = 0;
+            float normB = 0;
 
             for (int i = 0; i < vector1.Length; i++)
             {
@@ -23,8 +23,8 @@ namespace OpenAISharp.API
                 normB += vector2[i] * vector2[i];
             }
 
-            normA = (double)Math.Sqrt(normA);
-            normB = (double)Math.Sqrt(normB);
+            normA = (float)Math.Sqrt(normA);
+            normB = (float)Math.Sqrt(normB);
 
             if (normA == 0 || normB == 0)
             {
@@ -38,18 +38,18 @@ namespace OpenAISharp.API
     }
     public static class EuclideanDistance
     {
-        public static double Calculate(double[] a, double[] b)
+        public static float Calculate(float[] a, float[] b)
         {
             if (a.Length != b.Length)
                 throw new ArgumentException("Vectors must have the same length.");
 
-            double sum = 0.0;
+            float sum = 0.0f;
             for (int i = 0; i < a.Length; i++)
             {
-                double diff = a[i] - b[i];
+                float diff = a[i] - b[i];
                 sum += diff * diff;
             }
-            return Math.Sqrt(sum);
+            return (float)Math.Sqrt((double)sum);
         }
     }
 }

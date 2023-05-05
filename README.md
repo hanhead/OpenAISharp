@@ -1,5 +1,9 @@
+
 ## Introduction
 This C# library provides easy access to Open AI's powerful API for natural language processing and text generation. With just a few lines of code, you can use state-of-the-art deep learning models like GPT-3 and GPT-4 to generate human-like text, complete tasks, and more.
+
+Repository: https://github.com/hanhead/OpenAISharp
+Nuget: https://www.nuget.org/packages/OpenAISharp/
 
 ## Features
 * Simple and intuitive API for text generation and natural language processing
@@ -202,7 +206,34 @@ class MyEmbeddingVectorData
 
 ![search with open ai embedding and cosine similarity](https://raw.githubusercontent.com/hanhead/OpenAISharp/master/screenshots/search_with_open_ai_embedding_and_cosine_similarity.png)
 
-##### Set and get embeddings to Vector Database (RedisAI)
+##### Create and drop Index (Redis)
+The code connects to Redis database, creates a flat vector index called "myVectorIdx" with one field named "vec" that has 128 dimensions and uses L2 as a vector distance metric. Then it drops the index and closes the Redis connection.
+``` csharp
+using Newtonsoft.Json;
+using OpenAISharp;
+using OpenAISharp.API;
+using StackExchange.Redis;
+using NRedisStack;
+using OpenAISharp.API.RedisUtils;
+
+// Redis: https://redis.io/docs/about/
+// 1. To use RedisAI, you install Docker.
+// 2. After installing Docker, run the command "$ docker run -d --name redis-stack-server -p 6379:6379 redis/redis-stack-server:latest" to start the Redis stack server container.
+// 3. Finally, you need to install the necessary NuGet packages: StackExchange.Redis and NRedisStack, to use Redis in your .NET Core C# project.
+ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
+IDatabase db = redis.GetDatabase();
+FT.CreateFLATVector(db, "myVectorIdx", new List<FlatVectorDocumentField>() {
+    new FlatVectorDocumentField() {
+        FieldID = "vec", VectorDataType = FT.VectorDataType.FLOAT32, Dimension = 128, Vector_Distance_Metric = FT.Vector_Distance_Metric.L2
+    }
+});
+FT.DropIndex(db, "myVectorIdx", true);
+redis.Close();
+Console.ReadLine();
+
+```
+
+##### Set, get and search hash (Redis)
 
 ``` csharp
 using Newtonsoft.Json;
@@ -210,33 +241,75 @@ using OpenAISharp;
 using OpenAISharp.API;
 using StackExchange.Redis;
 using NRedisStack;
+using OpenAISharp.API.RedisUtils;
 
-OpenAIConfiguration.Load();
-double[] embedding = Embeddings.Request("The quick brown fox jumps over the lazy dog.", Embeddings.AvailableModel.text_embedding_ada_002).Result;
-string tensorName = "embedding:" + Guid.NewGuid().ToString();
-
-// RedisAI: https://oss.redis.com/redisai/
-// 1. To use RedisAI, you install Docker.
-// 2. After installing Docker, run the command "docker run -d --name redisai -p 6379:6379 redislabs/redisai:edge-cpu-bionic" to start the RedisAI container.
-// 3. Finally, you need to install the necessary NuGet packages: StackExchange.Redis and NRedisStack, to use RedisAI in your .NET Core C# project.
-
-string server = "localhost";
-ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(server);
+ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
 IDatabase db = redis.GetDatabase();
-RedisAIUtils.TensorSet(db, tensorName, embedding.Select(v=>(object)v).ToList(), RedisAIUtils.TensorInputDataType.DOUBLE, RedisAIUtils.TensorInputType.VALUES);
-Console.WriteLine(tensorName);
-Console.WriteLine(JsonConvert.SerializeObject(RedisAIUtils.TensorGet<double>(db, tensorName, RedisAIUtils.TensorOutputType.VALUES)));
+FT.CreateFLATVector(db, "myVectorIdx", new List<FlatVectorDocumentField>() {
+    new FlatVectorDocumentField() {
+        FieldID = "vec", VectorDataType = FT.VectorDataType.FLOAT32, Dimension = 128, Vector_Distance_Metric = FT.Vector_Distance_Metric.L2
+    }
+});
+FT.DropIndex(db, "myVectorIdx", true);
 redis.Close();
 Console.ReadLine();
 
 ```
-
-![Set and Get Embeddings To RedisAI](https://raw.githubusercontent.com/hanhead/OpenAISharp/master/screenshots/redis_ai_tensor_set_get.png)
-
-##### Recommendation with Vector Database
+##### Search Open AI embedding with vector database  (Open AI API + Redis)
 
 ``` csharp
-// Not implemented
+using Newtonsoft.Json;
+using OpenAISharp;
+using OpenAISharp.API;
+using StackExchange.Redis;
+using NRedisStack;
+using OpenAISharp.API.RedisUtils;
+
+List<Product> Products = new List<Product>()
+{
+    new Product() { Name = "Bose QuietComfort Earbuds", Description="True wireless earbuds with noise cancelling technology and up to 6 hours of battery life, ideal for music and calls on the go." },
+    new Product() { Name = "LG CX Series 65\" OLED TV", Description="4K Ultra HD Smart OLED TV with AI ThinQ, perfect for watching movies, TV shows, and gaming." },
+    new Product() { Name = "Dyson V11 Torque Drive Cordless Vacuum Cleaner", Description="Lightweight and powerful cordless vacuum cleaner with up to 60 minutes of run time and LCD screen displaying real-time battery life and performance data." },
+    new Product() { Name = "Apple MacBook Pro 13-inch", Description="Powerful and sleek laptop with Retina display, up to 10 hours of battery life, and the latest Apple M1 chip for exceptional performance." },
+    new Product() { Name = "Sony WH-1000XM4 Wireless Noise Cancelling Headphones", Description="Premium noise cancelling headphones with dual noise sensor technology, touch sensor controls, and up to 30 hours of battery life." },
+};
+
+OpenAIConfiguration.Load();
+List<float[]> queryEmbeddingVectors = await Embeddings.Request(Products.Select(t => t.Description).ToArray());
+for (int i = 0; i < queryEmbeddingVectors.Count; i++)
+{
+    Products[i].DescriptionEmbedding = queryEmbeddingVectors[i];
+}
+
+ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
+IDatabase db = redis.GetDatabase();
+
+FT.Create(db, "ProductIndex", new List<DocumentField>() {
+    new DocumentField() { FieldID="$.Name", FieldIDAlias="Name", FieldType= FT.FieldType.TEXT },
+    new DocumentField() { FieldID="$.Description", FieldIDAlias="Description", FieldType= FT.FieldType.TEXT },
+    new FlatVectorDocumentField() { FieldID="$.DescriptionEmbedding", FieldIDAlias="DescriptionEmbedding", VectorDataType = FT.VectorDataType.FLOAT32, Dimension = 1536, Vector_Distance_Metric = FT.Vector_Distance_Metric.L2 }.ToDocumentField(),
+}, FT.IndexDataType.JSON, new List<object>() { "PREFIX", "1", "product:" });
+
+for (int i = 0; i < Products.Count; i++)
+{
+    Json.Set(db, $"product:{i}", JsonConvert.SerializeObject(Products[i]));
+}
+
+// Redis query syntax: https://redis.io/docs/stack/search/reference/query_syntax/
+var response = FT.Search(db, "ProductIndex", "@Name:(EarBuds)");
+Console.WriteLine(JsonConvert.DeserializeObject<Product>(((List<object>)response[2])[1].ToString()).Name);
+
+// Redis vector similarity: https://redis.io/docs/stack/search/reference/vectors/
+string exampleSearchTerm = "headphone";
+float[] searchEmbedding = await Embeddings.Request(exampleSearchTerm);
+var response2 = FT.SearchKNN(db, "ProductIndex", "*=>[KNN 3 @DescriptionEmbedding $DescriptionEmbedding]", new List<KeyValuePair<string, float[]>>() { new KeyValuePair<string, float[]>("DescriptionEmbedding", searchEmbedding) });
+Console.WriteLine(JsonConvert.DeserializeObject<Product>(((List<object>)response2[2])[3].ToString()).Name);
+Console.WriteLine(JsonConvert.DeserializeObject<Product>(((List<object>)response2[4])[3].ToString()).Name);
+Console.WriteLine(JsonConvert.DeserializeObject<Product>(((List<object>)response2[6])[3].ToString()).Name);
+
+redis.Close();
+Console.ReadLine();
+
 ```
 
 ### Markdown utils example

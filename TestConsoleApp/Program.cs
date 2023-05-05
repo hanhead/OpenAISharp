@@ -3,6 +3,7 @@ using OpenAISharp;
 using OpenAISharp.API;
 using StackExchange.Redis;
 using NRedisStack;
+using OpenAISharp.API.RedisUtils;
 
 #region archived
 //CreateConfig();
@@ -18,18 +19,49 @@ using NRedisStack;
 //await CosineSimilaritySearchExample();
 #endregion
 
-using Newtonsoft.Json;
-using OpenAISharp;
-using OpenAISharp.API;
-using StackExchange.Redis;
-using NRedisStack;
-using System;
+List<Product> Products = new List<Product>()
+{
+    new Product() { Name = "Bose QuietComfort Earbuds", Description="True wireless earbuds with noise cancelling technology and up to 6 hours of battery life, ideal for music and calls on the go." },
+    new Product() { Name = "LG CX Series 65\" OLED TV", Description="4K Ultra HD Smart OLED TV with AI ThinQ, perfect for watching movies, TV shows, and gaming." },
+    new Product() { Name = "Dyson V11 Torque Drive Cordless Vacuum Cleaner", Description="Lightweight and powerful cordless vacuum cleaner with up to 60 minutes of run time and LCD screen displaying real-time battery life and performance data." },
+    new Product() { Name = "Apple MacBook Pro 13-inch", Description="Powerful and sleek laptop with Retina display, up to 10 hours of battery life, and the latest Apple M1 chip for exceptional performance." },
+    new Product() { Name = "Sony WH-1000XM4 Wireless Noise Cancelling Headphones", Description="Premium noise cancelling headphones with dual noise sensor technology, touch sensor controls, and up to 30 hours of battery life." },
+};
+
+OpenAIConfiguration.Load();
+List<float[]> queryEmbeddingVectors = await Embeddings.Request(Products.Select(t => t.Description).ToArray());
+for (int i = 0; i < queryEmbeddingVectors.Count; i++)
+{
+    Products[i].DescriptionEmbedding = queryEmbeddingVectors[i];
+}
 
 ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
 IDatabase db = redis.GetDatabase();
+FT.Create(db, "ProductIndex", new List<DocumentField>() {
+    new DocumentField() { FieldID="$.Name", FieldIDAlias="Name", FieldType= FT.FieldType.TEXT },
+    new DocumentField() { FieldID="$.Description", FieldIDAlias="Description", FieldType= FT.FieldType.TEXT },
+    new FlatVectorDocumentField() { FieldID="$.DescriptionEmbedding", FieldIDAlias="DescriptionEmbedding", VectorDataType = FT.VectorDataType.FLOAT32, Dimension = 1536, Vector_Distance_Metric = FT.Vector_Distance_Metric.L2 }.ToDocumentField(),
+}, FT.IndexDataType.JSON, new List<object>() { "PREFIX", "1", "product:" });
+
+for (int i = 0; i < Products.Count; i++)
+{
+    Json.Set(db, $"product:{i}", JsonConvert.SerializeObject(Products[i]));
+}
+// Redis query syntax: https://redis.io/docs/stack/search/reference/query_syntax/
+var response = FT.Search(db, "ProductIndex", "@Name:(EarBuds)");
+Console.WriteLine(JsonConvert.DeserializeObject<Product>(((List<object>)response[2])[1].ToString()).Name);
+// Redis vector similarity: https://redis.io/docs/stack/search/reference/vectors/
+string exampleSearchTerm = "headphone";
+float[] searchEmbedding = await Embeddings.Request(exampleSearchTerm);
+var response2 = FT.SearchKNN(db, "ProductIndex", "*=>[KNN 3 @DescriptionEmbedding $DescriptionEmbedding]", new List<KeyValuePair<string, float[]>>() { new KeyValuePair<string, float[]>("DescriptionEmbedding", searchEmbedding) });
+Console.WriteLine(JsonConvert.DeserializeObject<Product>(((List<object>)response2[2])[3].ToString()).Name);
+Console.WriteLine(JsonConvert.DeserializeObject<Product>(((List<object>)response2[4])[3].ToString()).Name);
+Console.WriteLine(JsonConvert.DeserializeObject<Product>(((List<object>)response2[6])[3].ToString()).Name);
 
 redis.Close();
 Console.ReadLine();
+
+
 
 #region archived
 static void CreateConfig()
@@ -129,7 +161,7 @@ static async Task PrepareMyEmbeddingVectorDatabase()
         new MyEmbeddingVectorData() { Text = "The quick brown dog barks at the lazy cat." }
     };
 
-    List<double[]> queryEmbeddingVectors = await Embeddings.Request(myTexts.Select(t => t.Text).ToArray());
+    List<float[]> queryEmbeddingVectors = await Embeddings.Request(myTexts.Select(t => t.Text).ToArray());
     for (int i = 0; i < queryEmbeddingVectors.Count; i++)
     {
         myTexts[i].EmbeddingVector = queryEmbeddingVectors[i];
@@ -144,7 +176,7 @@ static async Task CosineSimilaritySearchExample()
     List<MyEmbeddingVectorData> preparedTexts = JsonConvert.DeserializeObject<List<MyEmbeddingVectorData>>(System.IO.File.ReadAllText("myTexts.json"));
 
     string query = "The quick brown fox";
-    double[] queryEmbeddingVector = await Embeddings.Request(query);
+    float[] queryEmbeddingVector = await Embeddings.Request(query);
 
     foreach (MyEmbeddingVectorData t in preparedTexts)
     {
@@ -157,7 +189,7 @@ static async Task CosineSimilaritySearchExample()
 static void SetAndGetEmbeddingsToRedisAI()
 {
     OpenAIConfiguration.Load();
-    double[] embedding = Embeddings.Request("The quick brown fox jumps over the lazy dog.", Embeddings.AvailableModel.text_embedding_ada_002).Result;
+    float[] embedding = Embeddings.Request("The quick brown fox jumps over the lazy dog.", Embeddings.AvailableModel.text_embedding_ada_002).Result;
     string tensorName = "embedding:" + Guid.NewGuid().ToString();
 
     // RedisAI: https://oss.redis.com/redisai/
@@ -173,11 +205,62 @@ static void SetAndGetEmbeddingsToRedisAI()
     Console.WriteLine(JsonConvert.SerializeObject(RedisAIUtils.TensorGet<double>(db, tensorName, RedisAIUtils.TensorOutputType.VALUES)));
     redis.Close();
 }
+
+static void RedisCreateNDropIdex()
+{
+    // Redis: https://redis.io/docs/about/
+    // 1. To use RedisAI, you install Docker.
+    // 2. After installing Docker, run the command "$ docker run -d --name redis-stack-server -p 6379:6379 redis/redis-stack-server:latest" to start the Redis stack server container.
+    // 3. Finally, you need to install the necessary NuGet packages: StackExchange.Redis and NRedisStack, to use Redis in your .NET Core C# project.
+    ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
+    IDatabase db = redis.GetDatabase();
+    FT.CreateFLATVector(db, "myVectorIdx", new List<FlatVectorDocumentField>() {
+        new FlatVectorDocumentField() {
+            FieldID = "vec", VectorDataType = FT.VectorDataType.FLOAT32, Dimension = 128, Vector_Distance_Metric = FT.Vector_Distance_Metric.L2
+        }
+    });
+    FT.DropIndex(db, "myVectorIdx", true);
+    redis.Close();
+    Console.ReadLine();
+}
+
+static void HashSetNGetNSearch()
+{
+    ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
+    IDatabase db = redis.GetDatabase();
+    FT.Create(db, "myIdx", new List<DocumentField>() {
+    new DocumentField() { FieldID = "title", FieldType = FT.FieldType.TEXT, FieldOptions = new List<string>() { "WEIGHT", "5.0" } },
+    new DocumentField() { FieldID = "body", FieldType = FT.FieldType.TEXT },
+    new DocumentField() { FieldID = "url", FieldType = FT.FieldType.TEXT }
+}, FT.IndexDataType.HASH, new List<object>() { "PREFIX", "1", "doc:" });
+
+    HashStored.Set(db, "doc:1", new List<KeyValuePair<string, object>>() {
+    new KeyValuePair<string, object>("title", "hello world"),
+    new KeyValuePair<string, object>("body", "lorem ipsum"),
+    new KeyValuePair<string, object>("url", "http://redis.io")
+});
+    object result = HashStored.Get(db, "doc:1", "title").First();
+    Console.WriteLine(result);
+    List<object> response = FT.Search(db, "myIdx", "hello");
+    Console.WriteLine(JsonConvert.SerializeObject(response));
+    redis.Close();
+    Console.ReadLine();
+}
+
+
+
 class MyEmbeddingVectorData
 {
     public string Text { get; set; }
-    public double[] EmbeddingVector { get; set; }
+    public float[] EmbeddingVector { get; set; }
     public double CosineSimilarity { get; set; }
+}
+
+class Product
+{
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public float[] DescriptionEmbedding { get; set; }
 }
 #endregion
 
