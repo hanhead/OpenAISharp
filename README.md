@@ -323,7 +323,6 @@ Console.WriteLine(markdowncontent.MarkdownToHtml());
 
 ## Some ideas for future features:
 
-* Easy-to-understand examples for using embeddings
 * Case study examples for fine-tuning models
 * Prompt templates for generating customized text
 * Dataset pipeline features for processing and cleaning data
