@@ -67,28 +67,7 @@ namespace OpenAISharp.API
         #region Request Methods
         public static async Task<ChatResponse> Request(Chat chat)
         {
-            ChatResponse ChatResponse = null;
-            string result;
-            string organzationID = OpenAISettings.OrganizationID;
-            string apiKey = OpenAISettings.ApiKey;
-            var apiUrl = $"{OpenAISettings.UrlPrefix}{command}";
-            JsonSerializerSettings settings = new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore
-            };
-            using (var client = new HttpClient())
-            {
-                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
-                client.DefaultRequestHeaders.Add("OpenAI-Organization", organzationID);
-                string requestJson = JsonConvert.SerializeObject(chat, Formatting.Indented, settings);
-                StringContent requestJsonContent = new StringContent(requestJson, Encoding.UTF8, "application/json");
-                using (HttpResponseMessage response = await client.PostAsync(apiUrl, requestJsonContent))
-                {
-                    result = await response.Content.ReadAsStringAsync();
-                    ChatResponse = JsonConvert.DeserializeObject<ChatResponse>(result);
-                }
-            }
-            return ChatResponse;
+            return await Client.Request<ChatResponse>(command, chat);
         }
         public static async Task<string> Request(string chat)
         {

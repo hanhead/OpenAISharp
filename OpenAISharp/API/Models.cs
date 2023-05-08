@@ -4,65 +4,15 @@ namespace OpenAISharp.API
 {
     public class Models
     {
-        public static async Task<Models> List(bool cachedData = false)
+        public static async Task<Models> List()
         {
             string command = "/models";
-            string result;
-            Models models = new Models();
-            if (!cachedData)
-            {
-                string organzationID = OpenAISettings.OrganizationID;
-                string apiKey = OpenAISettings.ApiKey;
-                var apiUrl = $"{OpenAISettings.UrlPrefix}{command}";
-
-                using (var client = new HttpClient())
-                {
-                    client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
-                    client.DefaultRequestHeaders.Add("OpenAI-Organization", organzationID);
-                    using (HttpResponseMessage response = await client.GetAsync(apiUrl))
-                    {
-                        result = await response.Content.ReadAsStringAsync();
-                        System.IO.File.WriteAllText("cachedData\\models.json", result);
-                        models = JsonConvert.DeserializeObject<Models>(result);
-                    }
-                }
-            }
-            else
-            {
-                models = JsonConvert.DeserializeObject<Models>(System.IO.File.ReadAllText("cachedData\\models.json"));
-            }
-
-            return models;
+            return await Client.Request<Models>(command);
         }
-        public static async Task<Model> Get(string ModelName, bool cachedData = false)
+        public static async Task<Model> Get(string ModelName)
         {
-            string command = "/models/{0}";
-            string result;
-            Model model = new Model();
-            if (!cachedData)
-            {
-                string organzationID = OpenAISettings.OrganizationID;
-                string apiKey = OpenAISettings.ApiKey;
-                var apiUrl = $"{OpenAISettings.UrlPrefix}{string.Format(command, ModelName)}";
-
-                using (var client = new HttpClient())
-                {
-                    client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
-                    client.DefaultRequestHeaders.Add("OpenAI-Organization", organzationID);
-                    using (HttpResponseMessage response = await client.GetAsync(apiUrl))
-                    {
-                        result = await response.Content.ReadAsStringAsync();
-                        System.IO.File.WriteAllText($"cachedData\\models.{ModelName}.json", result);
-                        model = JsonConvert.DeserializeObject<Model>(result);
-                    }
-                }
-            }
-            else
-            {
-                model = JsonConvert.DeserializeObject<Model>(System.IO.File.ReadAllText($"cachedData\\models.{ModelName}.json"));
-            }
-
-            return model;
+            string command = string.Format("/models/{0}", ModelName);
+            return await Client.Request<Model>(command);
         }
         public string @object { get; set; }
         public List<Model> data { get; set; }

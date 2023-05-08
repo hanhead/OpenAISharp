@@ -32,31 +32,11 @@ namespace OpenAISharp.API
         }
         public static async Task<ModerationsResponse> Request(string[] input, AvailableModel? model = null)
         {
-            ModerationsResponse moderationsResponse = null;
-            string result;
-            string organzationID = OpenAISettings.OrganizationID;
-            string apiKey = OpenAISettings.ApiKey;
-            var apiUrl = $"{OpenAISettings.UrlPrefix}{command}";
-            using (var client = new HttpClient())
+            return await Client.Request<ModerationsResponse>(command, new Moderations
             {
-                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
-                client.DefaultRequestHeaders.Add("OpenAI-Organization", organzationID);
-                string requestJson = JsonConvert.SerializeObject(new Moderations 
-                { 
-                    input = input, 
-                    model = model==null?null:model.Value.GetDescription()
-                }, Formatting.Indented, new JsonSerializerSettings
-                {
-                    NullValueHandling = NullValueHandling.Ignore
-                });
-                StringContent requestJsonContent = new StringContent(requestJson, Encoding.UTF8, "application/json");
-                using (HttpResponseMessage response = await client.PostAsync(apiUrl, requestJsonContent))
-                {
-                    result = await response.Content.ReadAsStringAsync();
-                    moderationsResponse = JsonConvert.DeserializeObject<ModerationsResponse>(result);
-                }
-            }
-            return moderationsResponse;
+                input = input,
+                model = model == null ? null : model.Value.GetDescription()
+            });
         }
 
     }

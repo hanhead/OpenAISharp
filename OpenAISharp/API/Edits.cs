@@ -54,27 +54,7 @@ namespace OpenAISharp.API
         }
         public static async Task<EditsResponse> Request(Edits edits)
         {
-            EditsResponse editsResponse = null;
-            string result;
-            string organzationID = OpenAISettings.OrganizationID;
-            string apiKey = OpenAISettings.ApiKey;
-            var apiUrl = $"{OpenAISettings.UrlPrefix}{command}";
-            using (var client = new HttpClient())
-            {
-                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
-                client.DefaultRequestHeaders.Add("OpenAI-Organization", organzationID);
-                string requestJson = JsonConvert.SerializeObject(edits, Formatting.Indented, new JsonSerializerSettings
-                {
-                    NullValueHandling = NullValueHandling.Ignore
-                });
-                StringContent requestJsonContent = new StringContent(requestJson, Encoding.UTF8, "application/json");
-                using (HttpResponseMessage response = await client.PostAsync(apiUrl, requestJsonContent))
-                {
-                    result = await response.Content.ReadAsStringAsync();
-                    editsResponse = JsonConvert.DeserializeObject<EditsResponse>(result);
-                }
-            }
-            return editsResponse;
+            return await Client.Request<EditsResponse>(command, edits);
         }
     }
 }
