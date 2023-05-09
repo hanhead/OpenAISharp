@@ -9,7 +9,7 @@ namespace OpenAISharp.API
 {
     public class Client
     {
-        public static async Task<T> Request<T>(string command, object request = null)
+        public static async Task<T> Request<T>(string command, object request = null, MultipartFormDataContent multipartform = null)
         {
             T resultResponse;
             string result;
@@ -28,6 +28,14 @@ namespace OpenAISharp.API
                     });
                     StringContent requestJsonContent = new StringContent(requestJson, Encoding.UTF8, "application/json");
                     using (HttpResponseMessage response = await client.PostAsync(apiUrl, requestJsonContent))
+                    {
+                        result = await response.Content.ReadAsStringAsync();
+                        resultResponse = JsonConvert.DeserializeObject<T>(result);
+                    }
+                }
+                else if (multipartform != null)
+                {
+                    using (HttpResponseMessage response = await client.PostAsync(apiUrl, multipartform))
                     {
                         result = await response.Content.ReadAsStringAsync();
                         resultResponse = JsonConvert.DeserializeObject<T>(result);

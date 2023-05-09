@@ -148,6 +148,24 @@ if (images.Count > 0)
 
 ![cute magical flying dog by DALL-E](https://raw.githubusercontent.com/hanhead/OpenAISharp/master/screenshots/cute_magical_flying_dog.png)
 
+#### Edits Image
+
+``` csharp
+string edit_prompt = "Cute puppy wearing a magic hat";
+
+OpenAIConfiguration.Load();
+// https://www.online-image-editor.com/
+List<byte[]> images = await Images.editsImage("cute_magical_flying_dog_for_edit.png", edit_prompt, null, 1, Images.ImageSize.x512);
+if (images.Count > 0)
+{
+    System.IO.File.WriteAllBytes("cute_magical_flying_dog_for_edit_with_magic_hat.png", images[0]);
+}
+```
+
+![cute magical flying dog - transparency for edits](https://raw.githubusercontent.com/hanhead/OpenAISharp/master/screenshots/cute_magical_flying_dog_for_edit.png)
+![cute magical flying dog - edits by DALL-E](https://raw.githubusercontent.com/hanhead/OpenAISharp/master/screenshots/cute_magical_flying_dog_for_edit_with_magic_hat.png)
+
+
 ### OpenAI's GPT Embedding Vector
 
 OpenAI's GPT embedding vector is a numerical representation of words and phrases in a 768-dimensional space. It is trained on a large and diverse corpus of text data, making it exceptional in its ability to encode the meaning of language. The GPT embedding vector is used in a wide range of natural language processing tasks, as well as recommendation systems and anomaly detection.

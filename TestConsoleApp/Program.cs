@@ -19,15 +19,19 @@ using Newtonsoft.Json.Schema;
 //await EmbeddingsExample();
 //await CosineSimilaritySearchExample();
 //await KNNwithRedisExample();
+//await GenerateImageWithPrompt();
 #endregion
 
 
+
+string edit_prompt = "Cute puppy wearing a magic hat";
+
 OpenAIConfiguration.Load();
-string Sample_Image_Generation_Prompt = "a cute magical flying dog, fantasy art drawn by disney concept artists, golden colour, high quality, highly detailed, elegant, sharp focus, concept art, character concepts, digital painting, mystery, adventure";
-List<byte[]> images = await Images.Generate(Sample_Image_Generation_Prompt, 1, Images.ImageSize.x512);
+// https://www.online-image-editor.com/
+List<byte[]> images = await Images.editsImage("cute_magical_flying_dog_for_edit.png", edit_prompt, null, 1, Images.ImageSize.x512);
 if (images.Count > 0)
 {
-    System.IO.File.WriteAllBytes("cute_magical_flying_dog.png", images[0]);
+    System.IO.File.WriteAllBytes("cute_magical_flying_dog_for_edit_with_magic_hat.png", images[0]);
 }
 
 #region archived
@@ -257,6 +261,17 @@ static async Task KNNwithRedisExample()
 
     redis.Close();
     Console.ReadLine();
+}
+
+static async Task GenerateImageWithPrompt()
+{
+    OpenAIConfiguration.Load();
+    string Sample_Image_Generation_Prompt = "a cute magical flying dog, fantasy art drawn by disney concept artists, golden colour, high quality, highly detailed, elegant, sharp focus, concept art, character concepts, digital painting, mystery, adventure";
+    List<byte[]> images = await Images.Generate(Sample_Image_Generation_Prompt, 1, Images.ImageSize.x512);
+    if (images.Count > 0)
+    {
+        System.IO.File.WriteAllBytes("cute_magical_flying_dog.png", images[0]);
+    }
 }
 
 class MyEmbeddingVectorData
