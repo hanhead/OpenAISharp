@@ -27,6 +27,54 @@ namespace OpenAISharp.API
         public string size { get; set; }
         public string response_format { get; set; }
         public string user { get; set; }
+        public static async Task<ImagesResponse> variations(string imagepath, int? n = null, ImageSize? size = null, Response_Format? response_Format = null, string user = null)
+        {
+            StreamContent image = new StreamContent(System.IO.File.OpenRead(imagepath));
+            string imageName = Path.GetFileName(imagepath);
+            ImagesResponse imagesResponse = await variations(image, imageName, n, size, response_Format, user);
+            return imagesResponse;
+        }
+        public static async Task<List<byte[]>> variationsImage(string imagepath, int? n = null, ImageSize? size = null, string user = null)
+        {
+            ImagesResponse imagesResponse = await variations(imagepath, n, size, Response_Format.url, user);
+            string[] _urls = imagesResponse.data.Select(d => d.url).ToArray();
+            List<byte[]> _imageByteList = await GetBytesFromUrls(_urls);
+            return _imageByteList;
+        }
+        public static async Task<ImagesResponse> variations( StreamContent image, string imageName = "image.png", int? n = null, ImageSize? size = null, Response_Format? response_Format = null, string user = null)
+        {
+            ImagesResponse imagesResponse = null;
+            using (MultipartFormDataContent multipartFormData = new MultipartFormDataContent())
+            {
+                multipartFormData.Add(image, "image", imageName);
+                if (n.HasValue)
+                {
+                    multipartFormData.Add(new StringContent(n.Value.ToString()), "n");
+                }
+                if (size.HasValue)
+                {
+                    multipartFormData.Add(new StringContent(size.Value.GetDescription()), "size");
+                }
+                if (response_Format.HasValue)
+                {
+                    multipartFormData.Add(new StringContent(response_Format.Value.ToString()), "response_format");
+                }
+                if (user != null)
+                {
+                    multipartFormData.Add(new StringContent(user), "user");
+                }
+                imagesResponse = await Client.Request<ImagesResponse>(string.Format(command, "variations"), null, multipartFormData);
+            }
+
+            return imagesResponse;
+        }
+        public static async Task<List<byte[]>> variationsImage(StreamContent image, string imageName = "image.png", int? n = null, ImageSize? size = null, string user = null)
+        {
+            ImagesResponse imagesResponse = await variations(image, imageName, n, size, Response_Format.url, user);
+            string[] _urls = imagesResponse.data.Select(d => d.url).ToArray();
+            List<byte[]> _imageByteList = await GetBytesFromUrls(_urls);
+            return _imageByteList;
+        }
         public static async Task<ImagesResponse> edits(string imagepath, string prompt, string maskimagepath = null, int? n = null, ImageSize? size = null, Response_Format? response_Format = null, string user = null)
         {
             StreamContent image = new StreamContent(System.IO.File.OpenRead(imagepath));

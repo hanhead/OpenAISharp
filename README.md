@@ -165,6 +165,24 @@ if (images.Count > 0)
 ![cute magical flying dog - transparency for edits](https://raw.githubusercontent.com/hanhead/OpenAISharp/master/screenshots/cute_magical_flying_dog_for_edit.png)
 ![cute magical flying dog - edits by DALL-E](https://raw.githubusercontent.com/hanhead/OpenAISharp/master/screenshots/cute_magical_flying_dog_for_edit_with_magic_hat.png)
 
+#### Create variations of a given image.
+
+``` csharp
+
+OpenAIConfiguration.Load();
+List<byte[]> images = await Images.variationsImage("cute_magical_flying_dog_for_edit_with_magic_hat.png", 2, Images.ImageSize.x512);
+int _count = 1;
+foreach (byte[] image in images)
+{
+    System.IO.File.WriteAllBytes($"cute_magical_flying_dog_for_edit_with_magic_hat_variant_{_count}.png", image);
+    _count++;
+}
+
+```
+![cute magical flying dog - Variation 1](https://raw.githubusercontent.com/hanhead/OpenAISharp/master/screenshots/cute_magical_flying_dog_for_edit_with_magic_hat_variant_1.png)
+![cute magical flying dog - Variation 2](https://raw.githubusercontent.com/hanhead/OpenAISharp/master/screenshots/cute_magical_flying_dog_for_edit_with_magic_hat_variant_2.png)
+
+
 
 ### OpenAI's GPT Embedding Vector
 

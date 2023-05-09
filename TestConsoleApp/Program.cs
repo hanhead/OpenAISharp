@@ -5,6 +5,7 @@ using StackExchange.Redis;
 using NRedisStack;
 using OpenAISharp.API.RedisUtils;
 using Newtonsoft.Json.Schema;
+using System.Runtime.Intrinsics.X86;
 
 #region archived
 //CreateConfig();
@@ -20,19 +21,19 @@ using Newtonsoft.Json.Schema;
 //await CosineSimilaritySearchExample();
 //await KNNwithRedisExample();
 //await GenerateImageWithPrompt();
+//await EditsImageExample();
 #endregion
 
 
-
-string edit_prompt = "Cute puppy wearing a magic hat";
-
 OpenAIConfiguration.Load();
-// https://www.online-image-editor.com/
-List<byte[]> images = await Images.editsImage("cute_magical_flying_dog_for_edit.png", edit_prompt, null, 1, Images.ImageSize.x512);
-if (images.Count > 0)
+List<byte[]> images = await Images.variationsImage("cute_magical_flying_dog_for_edit_with_magic_hat.png", 2, Images.ImageSize.x512);
+int _count = 1;
+foreach (byte[] image in images)
 {
-    System.IO.File.WriteAllBytes("cute_magical_flying_dog_for_edit_with_magic_hat.png", images[0]);
+    System.IO.File.WriteAllBytes($"cute_magical_flying_dog_for_edit_with_magic_hat_variant_{_count}.png", image);
+    _count++;
 }
+
 
 #region archived
 static void CreateConfig()
@@ -271,6 +272,19 @@ static async Task GenerateImageWithPrompt()
     if (images.Count > 0)
     {
         System.IO.File.WriteAllBytes("cute_magical_flying_dog.png", images[0]);
+    }
+}
+
+static async Task EditsImageExample()
+{
+    string edit_prompt = "Cute puppy wearing a magic hat";
+
+    OpenAIConfiguration.Load();
+    // https://www.online-image-editor.com/
+    List<byte[]> images = await Images.editsImage("cute_magical_flying_dog_for_edit.png", edit_prompt, null, 1, Images.ImageSize.x512);
+    if (images.Count > 0)
+    {
+        System.IO.File.WriteAllBytes("cute_magical_flying_dog_for_edit_with_magic_hat.png", images[0]);
     }
 }
 
