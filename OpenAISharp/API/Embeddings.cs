@@ -43,7 +43,7 @@ namespace OpenAISharp.API
         }
         public static async Task<List<float[]>> Request(string[] input, AvailableModel model = AvailableModel.text_embedding_ada_002)
         {
-            Embeddings embeddings = new Embeddings() { input = input, SelectedModel =  model};
+            Embeddings embeddings = new Embeddings() { input = input, model = model.GetDescription() };
             EmbeddingsResponse response = await Request(embeddings);
             if (response != null)
             {

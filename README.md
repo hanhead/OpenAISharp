@@ -132,6 +132,19 @@ Console.WriteLine(result ? "Violated" : "Pass");
 Console.ReadLine();
 ```
 
+### Images (DALL-E)
+``` csharp
+OpenAIConfiguration.Load();
+string Sample_Image_Generation_Prompt = "a cute magical flying dog, fantasy art drawn by disney concept artists, golden colour, high quality, highly detailed, elegant, sharp focus, concept art, character concepts, digital painting, mystery, adventure";
+List<byte[]> images = await Images.Generate(Sample_Image_Generation_Prompt, 1, Images.ImageSize.x512);
+if (images.Count > 0)
+{
+    System.IO.File.WriteAllBytes("cute_magical_flying_dog.png", images[0]);
+}
+```
+
+![cute magical flying dog by DALL-E](https://raw.githubusercontent.com/hanhead/OpenAISharp/master/screenshots/cute_magical_flying_dog.png)
+
 ### OpenAI's GPT Embedding Vector
 
 OpenAI's GPT embedding vector is a numerical representation of words and phrases in a 768-dimensional space. It is trained on a large and diverse corpus of text data, making it exceptional in its ability to encode the meaning of language. The GPT embedding vector is used in a wide range of natural language processing tasks, as well as recommendation systems and anomaly detection.

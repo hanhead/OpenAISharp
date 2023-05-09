@@ -4,64 +4,31 @@ using OpenAISharp.API;
 using StackExchange.Redis;
 using NRedisStack;
 using OpenAISharp.API.RedisUtils;
+using Newtonsoft.Json.Schema;
 
 #region archived
 //CreateConfig();
 //await GetAllModels();
 //await CompletionsExample();
 //await ChatExampleRaw();
-//await ChatExample()
+//await ChatExample();
 //MarkdownUtils();
 //await ModerationsExample();
 //await EditsExample1();
 //await EditExample2();
 //await EmbeddingsExample();
 //await CosineSimilaritySearchExample();
+//await KNNwithRedisExample();
 #endregion
 
-List<Product> Products = new List<Product>()
-{
-    new Product() { Name = "Bose QuietComfort Earbuds", Description="True wireless earbuds with noise cancelling technology and up to 6 hours of battery life, ideal for music and calls on the go." },
-    new Product() { Name = "LG CX Series 65\" OLED TV", Description="4K Ultra HD Smart OLED TV with AI ThinQ, perfect for watching movies, TV shows, and gaming." },
-    new Product() { Name = "Dyson V11 Torque Drive Cordless Vacuum Cleaner", Description="Lightweight and powerful cordless vacuum cleaner with up to 60 minutes of run time and LCD screen displaying real-time battery life and performance data." },
-    new Product() { Name = "Apple MacBook Pro 13-inch", Description="Powerful and sleek laptop with Retina display, up to 10 hours of battery life, and the latest Apple M1 chip for exceptional performance." },
-    new Product() { Name = "Sony WH-1000XM4 Wireless Noise Cancelling Headphones", Description="Premium noise cancelling headphones with dual noise sensor technology, touch sensor controls, and up to 30 hours of battery life." },
-};
 
 OpenAIConfiguration.Load();
-List<float[]> queryEmbeddingVectors = await Embeddings.Request(Products.Select(t => t.Description).ToArray());
-for (int i = 0; i < queryEmbeddingVectors.Count; i++)
+string Sample_Image_Generation_Prompt = "a cute magical flying dog, fantasy art drawn by disney concept artists, golden colour, high quality, highly detailed, elegant, sharp focus, concept art, character concepts, digital painting, mystery, adventure";
+List<byte[]> images = await Images.Generate(Sample_Image_Generation_Prompt, 1, Images.ImageSize.x512);
+if (images.Count > 0)
 {
-    Products[i].DescriptionEmbedding = queryEmbeddingVectors[i];
+    System.IO.File.WriteAllBytes("cute_magical_flying_dog.png", images[0]);
 }
-
-ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
-IDatabase db = redis.GetDatabase();
-FT.Create(db, "ProductIndex", new List<DocumentField>() {
-    new DocumentField() { FieldID="$.Name", FieldIDAlias="Name", FieldType= FT.FieldType.TEXT },
-    new DocumentField() { FieldID="$.Description", FieldIDAlias="Description", FieldType= FT.FieldType.TEXT },
-    new FlatVectorDocumentField() { FieldID="$.DescriptionEmbedding", FieldIDAlias="DescriptionEmbedding", VectorDataType = FT.VectorDataType.FLOAT32, Dimension = 1536, Vector_Distance_Metric = FT.Vector_Distance_Metric.L2 }.ToDocumentField(),
-}, FT.IndexDataType.JSON, new List<object>() { "PREFIX", "1", "product:" });
-
-for (int i = 0; i < Products.Count; i++)
-{
-    Json.Set(db, $"product:{i}", JsonConvert.SerializeObject(Products[i]));
-}
-// Redis query syntax: https://redis.io/docs/stack/search/reference/query_syntax/
-var response = FT.Search(db, "ProductIndex", "@Name:(EarBuds)");
-Console.WriteLine(JsonConvert.DeserializeObject<Product>(((List<object>)response[2])[1].ToString()).Name);
-// Redis vector similarity: https://redis.io/docs/stack/search/reference/vectors/
-string exampleSearchTerm = "headphone";
-float[] searchEmbedding = await Embeddings.Request(exampleSearchTerm);
-var response2 = FT.SearchKNN(db, "ProductIndex", "*=>[KNN 3 @DescriptionEmbedding $DescriptionEmbedding]", new List<KeyValuePair<string, float[]>>() { new KeyValuePair<string, float[]>("DescriptionEmbedding", searchEmbedding) });
-Console.WriteLine(JsonConvert.DeserializeObject<Product>(((List<object>)response2[2])[3].ToString()).Name);
-Console.WriteLine(JsonConvert.DeserializeObject<Product>(((List<object>)response2[4])[3].ToString()).Name);
-Console.WriteLine(JsonConvert.DeserializeObject<Product>(((List<object>)response2[6])[3].ToString()).Name);
-
-redis.Close();
-Console.ReadLine();
-
-
 
 #region archived
 static void CreateConfig()
@@ -77,7 +44,7 @@ static void CreateConfig()
 static async Task GetAllModels()
 {
     OpenAIConfiguration.Load();
-    Models models = await Models.List(true);
+    Models models = await Models.List();
     foreach (var model in models.data)
     {
         Console.WriteLine(model.id);
@@ -247,7 +214,50 @@ static void HashSetNGetNSearch()
     Console.ReadLine();
 }
 
+static async Task KNNwithRedisExample()
+{
+    List<Product> Products = new List<Product>()
+{
+    new Product() { Name = "Bose QuietComfort Earbuds", Description="True wireless earbuds with noise cancelling technology and up to 6 hours of battery life, ideal for music and calls on the go." },
+    new Product() { Name = "LG CX Series 65\" OLED TV", Description="4K Ultra HD Smart OLED TV with AI ThinQ, perfect for watching movies, TV shows, and gaming." },
+    new Product() { Name = "Dyson V11 Torque Drive Cordless Vacuum Cleaner", Description="Lightweight and powerful cordless vacuum cleaner with up to 60 minutes of run time and LCD screen displaying real-time battery life and performance data." },
+    new Product() { Name = "Apple MacBook Pro 13-inch", Description="Powerful and sleek laptop with Retina display, up to 10 hours of battery life, and the latest Apple M1 chip for exceptional performance." },
+    new Product() { Name = "Sony WH-1000XM4 Wireless Noise Cancelling Headphones", Description="Premium noise cancelling headphones with dual noise sensor technology, touch sensor controls, and up to 30 hours of battery life." },
+};
 
+    OpenAIConfiguration.Load();
+    List<float[]> queryEmbeddingVectors = await Embeddings.Request(Products.Select(t => t.Description).ToArray());
+    for (int i = 0; i < queryEmbeddingVectors.Count; i++)
+    {
+        Products[i].DescriptionEmbedding = queryEmbeddingVectors[i];
+    }
+
+    ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
+    IDatabase db = redis.GetDatabase();
+    FT.Create(db, "ProductIndex", new List<DocumentField>() {
+    new DocumentField() { FieldID="$.Name", FieldIDAlias="Name", FieldType= FT.FieldType.TEXT },
+    new DocumentField() { FieldID="$.Description", FieldIDAlias="Description", FieldType= FT.FieldType.TEXT },
+    new FlatVectorDocumentField() { FieldID="$.DescriptionEmbedding", FieldIDAlias="DescriptionEmbedding", VectorDataType = FT.VectorDataType.FLOAT32, Dimension = 1536, Vector_Distance_Metric = FT.Vector_Distance_Metric.L2 }.ToDocumentField(),
+}, FT.IndexDataType.JSON, new List<object>() { "PREFIX", "1", "product:" });
+
+    for (int i = 0; i < Products.Count; i++)
+    {
+        Json.Set(db, $"product:{i}", JsonConvert.SerializeObject(Products[i]));
+    }
+    // Redis query syntax: https://redis.io/docs/stack/search/reference/query_syntax/
+    var response = FT.Search(db, "ProductIndex", "@Name:(EarBuds)");
+    Console.WriteLine(JsonConvert.DeserializeObject<Product>(((List<object>)response[2])[1].ToString()).Name);
+    // Redis vector similarity: https://redis.io/docs/stack/search/reference/vectors/
+    string exampleSearchTerm = "headphone";
+    float[] searchEmbedding = await Embeddings.Request(exampleSearchTerm);
+    var response2 = FT.SearchKNN(db, "ProductIndex", "*=>[KNN 3 @DescriptionEmbedding $DescriptionEmbedding]", new List<KeyValuePair<string, float[]>>() { new KeyValuePair<string, float[]>("DescriptionEmbedding", searchEmbedding) });
+    Console.WriteLine(JsonConvert.DeserializeObject<Product>(((List<object>)response2[2])[3].ToString()).Name);
+    Console.WriteLine(JsonConvert.DeserializeObject<Product>(((List<object>)response2[4])[3].ToString()).Name);
+    Console.WriteLine(JsonConvert.DeserializeObject<Product>(((List<object>)response2[6])[3].ToString()).Name);
+
+    redis.Close();
+    Console.ReadLine();
+}
 
 class MyEmbeddingVectorData
 {
