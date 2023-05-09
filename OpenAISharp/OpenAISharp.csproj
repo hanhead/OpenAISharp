@@ -11,9 +11,9 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/hanhead/OpenAISharp</RepositoryUrl>
     <PackageTags>Open AI;Chat GPT;machine learning;ai;gpt;</PackageTags>
-    <AssemblyVersion>1.0.6</AssemblyVersion>
-    <FileVersion>1.0.6</FileVersion>
-	  <Version>1.0.6</Version>
+    <AssemblyVersion>1.0.7</AssemblyVersion>
+    <FileVersion>1.0.7</FileVersion>
+	  <Version>1.0.7</Version>
   </PropertyGroup>
 
   <ItemGroup>
