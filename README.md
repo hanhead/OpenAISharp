@@ -133,6 +133,9 @@ Console.ReadLine();
 ```
 
 ### Images (DALL-E)
+
+#### Generate Image with Text Prompt
+
 ``` csharp
 OpenAIConfiguration.Load();
 string Sample_Image_Generation_Prompt = "a cute magical flying dog, fantasy art drawn by disney concept artists, golden colour, high quality, highly detailed, elegant, sharp focus, concept art, character concepts, digital painting, mystery, adventure";
